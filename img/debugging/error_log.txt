@@ -1,0 +1,33 @@
+[2025-03-21 20:40:49] 오류: Traceback (most recent call last):
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/macro_runner.py", line 174, in _run_macro
+    result = self.image_matcher.find_template(template_id, template)
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/image_matcher.py", line 211, in find_template
+    result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
+cv2.error: OpenCV(4.10.0) :-1: error: (-5:Bad argument) in function 'matchTemplate'
+> Overload resolution failed:
+>  - templ is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'templ'
+
+
+[2025-03-21 20:40:53] 오류: Traceback (most recent call last):
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/macro_runner.py", line 174, in _run_macro
+    result = self.image_matcher.find_template(template_id, template)
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/image_matcher.py", line 211, in find_template
+    result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
+cv2.error: OpenCV(4.10.0) :-1: error: (-5:Bad argument) in function 'matchTemplate'
+> Overload resolution failed:
+>  - templ is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'templ'
+
+
+[2025-03-21 20:40:56] 오류: Traceback (most recent call last):
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/macro_runner.py", line 174, in _run_macro
+    result = self.image_matcher.find_template(template_id, template)
+  File "/Users/mac/Documents/GitHub/myGit/deeporder/core_functions/image_matcher.py", line 211, in find_template
+    result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
+cv2.error: OpenCV(4.10.0) :-1: error: (-5:Bad argument) in function 'matchTemplate'
+> Overload resolution failed:
+>  - templ is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'templ'
+
+

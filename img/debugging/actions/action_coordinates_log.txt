@@ -1,0 +1,495 @@
+[20250319_185720] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2627, 147, 41, 37)
+  Center: (2647, 165)
+
+[20250319_185720] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2759, 145, 44, 42)
+  Center: (2781, 166)
+
+[20250319_185721] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2688, 165, 52, 22)
+  Center: (2714, 176)
+
+[20250319_185722] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2624, 192, 91, 35)
+  Center: (2669, 209)
+
+[20250319_185723] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2717, 192, 90, 36)
+  Center: (2762, 210)
+
+[20250319_190223] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2707, 883, 369, 333)
+  Center: (2891, 1049)
+
+[20250319_190224] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3895, 865, 396, 378)
+  Center: (4093, 1054)
+
+[20250319_190225] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3256, 1045, 468, 198)
+  Center: (3490, 1144)
+
+[20250319_190225] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2680, 1288, 819, 315)
+  Center: (3089, 1445)
+
+[20250319_190226] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3517, 1288, 810, 324)
+  Center: (3922, 1450)
+
+[20250319_190347] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2707, 883, 369, 333)
+  Center: (2891, 1049)
+
+[20250319_190348] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3895, 865, 396, 378)
+  Center: (4093, 1054)
+
+[20250319_190348] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3256, 1045, 468, 198)
+  Center: (3490, 1144)
+
+[20250319_190349] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2680, 1288, 819, 315)
+  Center: (3089, 1445)
+
+[20250319_190350] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3517, 1288, 810, 324)
+  Center: (3922, 1450)
+
+[20250319_190447] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2637, 239, 82, 74)
+  Center: (2678, 276)
+
+[20250319_190448] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2901, 235, 88, 84)
+  Center: (2945, 277)
+
+[20250319_190449] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2759, 275, 104, 44)
+  Center: (2811, 297)
+
+[20250319_190450] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2631, 329, 182, 70)
+  Center: (2722, 364)
+
+[20250319_190451] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2817, 329, 180, 72)
+  Center: (2907, 365)
+
+[20250319_190557] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2657, 423, 164, 148)
+  Center: (2739, 497)
+
+[20250319_190558] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3185, 415, 176, 168)
+  Center: (3273, 499)
+
+[20250319_190559] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2901, 495, 208, 88)
+  Center: (3005, 539)
+
+[20250319_190600] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2645, 603, 364, 140)
+  Center: (2827, 673)
+
+[20250319_190600] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3017, 603, 360, 144)
+  Center: (3197, 675)
+
+[20250319_190651] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2652, 377, 143, 129)
+  Center: (2723, 441)
+
+[20250319_190651] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3114, 370, 154, 147)
+  Center: (3191, 443)
+
+[20250319_190652] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2865, 440, 182, 77)
+  Center: (2956, 478)
+
+[20250319_190653] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2641, 534, 318, 122)
+  Center: (2800, 595)
+
+[20250319_190654] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2967, 534, 315, 126)
+  Center: (3124, 597)
+
+[20250319_190730] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2654, 395, 151, 136)
+  Center: (2729, 463)
+
+[20250319_190731] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3142, 388, 162, 155)
+  Center: (3223, 465)
+
+[20250319_190732] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2879, 462, 192, 81)
+  Center: (2975, 502)
+
+[20250319_190733] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2642, 561, 336, 129)
+  Center: (2810, 625)
+
+[20250319_190734] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2987, 561, 333, 133)
+  Center: (3153, 627)
+
+[20250319_190828] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2654, 400, 153, 138)
+  Center: (2730, 469)
+
+[20250319_190829] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (3149, 392, 165, 157)
+  Center: (3231, 470)
+
+[20250319_190830] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2883, 467, 195, 82)
+  Center: (2980, 508)
+
+[20250319_190830] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2643, 568, 341, 131)
+  Center: (2813, 633)
+
+[20250319_190831] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2992, 568, 337, 135)
+  Center: (3160, 635)
+
+[20250319_191921] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2637, 239, 82, 74)
+  Center: (2678, 276)
+
+[20250319_191921] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2901, 235, 88, 84)
+  Center: (2945, 277)
+
+[20250319_191922] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2759, 275, 104, 44)
+  Center: (2811, 297)
+
+[20250319_191923] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2631, 329, 182, 70)
+  Center: (2722, 364)
+
+[20250319_191924] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2817, 329, 180, 72)
+  Center: (2907, 365)
+
+[20250319_192240] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2637, 239, 82, 74)
+  Center: (2678, 276)
+
+[20250319_192241] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2901, 235, 88, 84)
+  Center: (2945, 277)
+
+[20250319_192242] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2759, 275, 104, 44)
+  Center: (2811, 297)
+
+[20250319_192243] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2631, 329, 182, 70)
+  Center: (2722, 364)
+
+[20250319_192243] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2817, 329, 180, 72)
+  Center: (2907, 365)
+
+[20250319_192628] M1_A1-M1_A2
+  Template ID: M1_A1
+  Action ID: M1_A2
+  Template Position: (2617, 55)
+  Original Coords: (10, 92, 41, 37)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2635, 227, 76, 69)
+  Center: (2673, 261)
+
+[20250319_192629] M1_A1-M1_A3
+  Template ID: M1_A1
+  Action ID: M1_A3
+  Template Position: (2617, 55)
+  Original Coords: (142, 90, 44, 42)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2883, 223, 82, 78)
+  Center: (2924, 262)
+
+[20250319_192629] M1_A1-M1_A4
+  Template ID: M1_A1
+  Action ID: M1_A4
+  Template Position: (2617, 55)
+  Original Coords: (71, 110, 52, 22)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2750, 261, 97, 41)
+  Center: (2798, 281)
+
+[20250319_192630] M1_A1-M1_A5
+  Template ID: M1_A1
+  Action ID: M1_A5
+  Template Position: (2617, 55)
+  Original Coords: (7, 137, 91, 35)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2630, 311, 170, 65)
+  Center: (2715, 343)
+
+[20250319_192631] M1_A1-M1_A6
+  Template ID: M1_A1
+  Action ID: M1_A6
+  Template Position: (2617, 55)
+  Original Coords: (100, 137, 90, 36)
+  Scale: (1.00, 1.00)
+  Scaled Action: (2804, 311, 168, 67)
+  Center: (2888, 344)
+

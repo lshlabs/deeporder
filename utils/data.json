@@ -1,0 +1,176 @@
+{
+    "macro_list": {
+        "M1": {
+            "name": "테스트1",
+            "actions": {
+                "A1": {
+                    "name": "원본 이미지",
+                    "type": "image",
+                    "number": 1,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A1.png",
+                    "priority": false,
+                    "coordinates": [
+                        0,
+                        0,
+                        738,
+                        668
+                    ]
+                },
+                "A2": {
+                    "name": "- 버튼 이미지",
+                    "type": "image",
+                    "number": 2,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A2.png",
+                    "priority": false,
+                    "coordinates": [
+                        27,
+                        185,
+                        70,
+                        70
+                    ]
+                },
+                "A3": {
+                    "name": "+ 버튼 이미지",
+                    "type": "image",
+                    "number": 3,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A3.png",
+                    "priority": false,
+                    "coordinates": [
+                        297,
+                        181,
+                        71,
+                        77
+                    ]
+                },
+                "A4": {
+                    "name": "예상시간 이미지",
+                    "type": "image",
+                    "number": 4,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A4.png",
+                    "priority": false,
+                    "coordinates": [
+                        153,
+                        215,
+                        87,
+                        52
+                    ]
+                },
+                "A5": {
+                    "name": "거부버튼 이미지",
+                    "type": "image",
+                    "number": 5,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A5.png",
+                    "priority": false,
+                    "coordinates": [
+                        17,
+                        278,
+                        177,
+                        58
+                    ]
+                },
+                "A6": {
+                    "name": "접수버튼 이미지",
+                    "type": "image",
+                    "number": 6,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/테스트1/A6.png",
+                    "priority": false,
+                    "coordinates": [
+                        200,
+                        278,
+                        178,
+                        60
+                    ]
+                }
+            },
+            "program": "Google Chrome"
+        },
+        "M2": {
+            "name": "test2",
+            "actions": {
+                "A1": {
+                    "name": "원본 이미지",
+                    "type": "image",
+                    "number": 1,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A1.png",
+                    "priority": false,
+                    "coordinates": [
+                        0,
+                        0,
+                        738,
+                        668
+                    ]
+                },
+                "A2": {
+                    "name": "- 버튼 이미지",
+                    "type": "image",
+                    "number": 2,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A2.png",
+                    "priority": false,
+                    "coordinates": [
+                        47,
+                        364,
+                        145,
+                        134
+                    ]
+                },
+                "A3": {
+                    "name": "+ 버튼 이미지",
+                    "type": "image",
+                    "number": 3,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A3.png",
+                    "priority": false,
+                    "coordinates": [
+                        581,
+                        364,
+                        148,
+                        140
+                    ]
+                },
+                "A4": {
+                    "name": "예상시간 이미지",
+                    "type": "image",
+                    "number": 4,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A4.png",
+                    "priority": false,
+                    "coordinates": [
+                        290,
+                        417,
+                        181,
+                        103
+                    ]
+                },
+                "A5": {
+                    "name": "거부버튼 이미지",
+                    "type": "image",
+                    "number": 5,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A5.png",
+                    "priority": false,
+                    "coordinates": [
+                        14,
+                        272,
+                        180,
+                        67
+                    ]
+                },
+                "A6": {
+                    "name": "접수버튼 이미지",
+                    "type": "image",
+                    "number": 6,
+                    "image": "/Users/mac/Documents/GitHub/myGit/deeporder/img/test2/A6.png",
+                    "priority": false,
+                    "coordinates": [
+                        195,
+                        270,
+                        185,
+                        72
+                    ]
+                }
+            },
+            "program": "Designer"
+        }
+    },
+    "settings_main": {
+        "resolution": "1680 x 1050",
+        "custom": true
+    }
+}
