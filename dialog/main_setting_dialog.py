@@ -1,11 +1,12 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
 from utils.data_manager import DataManager
+from utils.path_manager import ui_path
 
 class MainSettingDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/MainsettingWindow.ui', self)
+        uic.loadUi(str(ui_path("MainsettingWindow.ui")), self)
         self.data_manager = DataManager.get_instance()
         self.init_ui()
         self.connect_signals()

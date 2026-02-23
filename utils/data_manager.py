@@ -3,7 +3,9 @@ import json
 import shutil
 from PIL import Image
 from utils.temp_manager import TempManager
+from utils.path_manager import data_path as managed_data_path, img_path as managed_img_path, make_relative_to_base, resolve_project_path
 import os
+import copy
 
 class DataManager:
     _instance = None
@@ -18,8 +20,8 @@ class DataManager:
         if DataManager._instance is not None:
             raise Exception("DataManager는 싱글톤 클래스입니다.")
         
-        self.data_path = Path(__file__).parent / 'data.json'
-        self.img_path = Path(__file__).parents[1] / 'img'
+        self.data_path = managed_data_path()
+        self.img_path = managed_img_path()
         self._data = self._load_data()
         DataManager._instance = self
     
@@ -37,25 +39,55 @@ class DataManager:
             if self.data_path.exists():
                 with open(self.data_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    # 기존 매크로에 program 필드 추가
-                    for macro in data.get('macro_list', {}).values():
-                        if 'program' not in macro:
-                            macro['program'] = None
+                    self._normalize_loaded_data(data)
                     return data
+            self._normalize_loaded_data(default_data)
             return default_data
         except Exception as e:
             print(f"데이터 로드 중 오류 발생: {e}")
+            self._normalize_loaded_data(default_data)
             return default_data
+
+    def _ensure_macro_defaults(self, macro: dict):
+        macro.setdefault('program', None)
+        settings = macro.setdefault('settings', {})
+        settings.setdefault('matcher_mode', 'ocr')
+        settings.setdefault('max_retries', 10)
+        settings.setdefault('retry_interval_sec', 0.5)
+        settings.setdefault('template_timeout_sec', 10.0)
+        return macro
     
     def save_data(self):
         """데이터 저장"""
         try:
             with open(self.data_path, 'w', encoding='utf-8') as f:
-                json.dump(self._data, f, indent=4, ensure_ascii=False)
+                json.dump(self._serialize_data(), f, indent=4, ensure_ascii=False)
             return True
         except Exception as e:
             print(f"데이터 저장 중 오류 발생: {e}")
             return False
+
+    def _normalize_loaded_data(self, data):
+        macro_list = data.setdefault('macro_list', {})
+        data.setdefault('settings_main', {'resolution': None, 'custom': False})
+        for macro in macro_list.values():
+            self._ensure_macro_defaults(macro)
+            for action in macro.get('actions', {}).values():
+                if not isinstance(action, dict):
+                    continue
+                action.setdefault('enabled', True)
+                if action.get('type') == 'image' and action.get('image'):
+                    resolved = resolve_project_path(action.get('image'))
+                    if resolved is not None:
+                        action['image'] = str(resolved)
+
+    def _serialize_data(self):
+        data_copy = copy.deepcopy(self._data)
+        for macro in data_copy.get('macro_list', {}).values():
+            for action in macro.get('actions', {}).values():
+                if isinstance(action, dict) and action.get('type') == 'image' and action.get('image'):
+                    action['image'] = make_relative_to_base(action['image'])
+        return data_copy
     
     def _wizard_actions_common(self, macro_key, mapping, starting_action_number):
         """
@@ -122,8 +154,9 @@ class DataManager:
                 'name': action_name,
                 'type': 'image',
                 'number': action_number,
-                'image': str(macro_folder / filename),
+                'image': str((macro_folder / filename).resolve()),
                 'priority': False,
+                'enabled': True,
                 'coordinates': coordinates
             }
             action_number += 1
@@ -135,6 +168,7 @@ class DataManager:
         신규 매크로 생성 시, 초기 액션 생성 및 이미지 복사.
         """
         # 신규 매크로에서는 고정된 매핑과 번호를 사용
+        self._ensure_macro_defaults(self._data['macro_list'][macro_key])
         mapping = {
             'step1': ('원본 이미지', 'A1.png'),
             'minus': ('- 버튼 이미지', 'A2.png'),
@@ -153,6 +187,7 @@ class DataManager:
         기존 매크로에 대해서 추가 액션 생성 및 이미지 복사.
         """
         actions = self._data['macro_list'][macro_key]['actions']
+        self._ensure_macro_defaults(self._data['macro_list'][macro_key])
         macro_name = self._data['macro_list'][macro_key]['name']
         macro_folder = self.img_path / macro_name
 
@@ -215,7 +250,8 @@ class DataManager:
                 'type': 'delay',
                 'number': new_number,
                 'value': float(delay_time),
-                'priority': False
+                'priority': False,
+                'enabled': True
             }
             
             return self.save_data()
@@ -280,6 +316,7 @@ class DataManager:
             new_macro = {
                 'name': new_name,
                 'program': original_macro.get('program'),
+                'settings': original_macro.get('settings', {}).copy(),
                 'actions': {}
             }
             
@@ -301,7 +338,7 @@ class DataManager:
                 for action in new_macro['actions'].values():
                     if action['type'] == 'image':
                         old_path = Path(action['image'])
-                        action['image'] = str(new_folder / old_path.name)
+                        action['image'] = str((new_folder / old_path.name).resolve())
             
             # 새로운 매크로 저장
             self._data['macro_list'][new_macro_key] = new_macro

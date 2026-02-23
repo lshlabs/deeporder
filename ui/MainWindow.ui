@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>570</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -44,7 +44,7 @@
       <x>10</x>
       <y>10</y>
       <width>480</width>
-      <height>550</height>
+      <height>680</height>
      </rect>
     </property>
     <property name="font">
@@ -474,11 +474,36 @@ QListWidget::item {
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QPlainTextEdit" name="textBrowser_log">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>530</y>
+       <width>420</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPlainTextEdit {
+    color: black;
+    background-color: #FAFAFA;
+    border: 1px solid #BDBDBD;
+    border-radius: 5px;
+    padding: 4px;
+}</string>
+     </property>
+     <property name="placeholderText">
+      <string>실행 로그가 여기에 표시됩니다.</string>
+     </property>
+    </widget>
     <widget class="QLabel" name="label_version">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>530</y>
+       <y>655</y>
        <width>130</width>
        <height>10</height>
       </rect>

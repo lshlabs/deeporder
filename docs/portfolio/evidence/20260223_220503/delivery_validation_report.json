@@ -1,0 +1,16 @@
+{
+  "baemin": {
+    "sample_source": "test_results/09231919/baemin_detection.png",
+    "status": "ok",
+    "detected_app": "baemin",
+    "buttons_found_keys": [
+      "accept",
+      "reject"
+    ]
+  },
+  "coupang": {
+    "sample_source": "test_results/09252104/coupang_detection.png",
+    "status": "system_exit",
+    "system_exit_code": 1
+  }
+}

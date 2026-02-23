@@ -10,12 +10,13 @@ from dialog.wizard_step2_dialog import WizardStep2Dialog
 from dialog.wizard_step3_dialog import WizardStep3Dialog
 from utils.temp_manager import TempManager
 from utils.data_manager import DataManager
+from utils.path_manager import ui_path
 from PIL import Image
 
 class ActionWizardDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, title_text=""):
         super().__init__(parent)
-        uic.loadUi('ui/ActionWizardWindow.ui', self)
+        uic.loadUi(str(ui_path("ActionWizardWindow.ui")), self)
         self.setFixedSize(500, 470)
         self.title_text = title_text
         self.is_new_macro = not isinstance(parent, ActionDialog)  # 호출 출처 구분

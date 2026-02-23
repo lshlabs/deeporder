@@ -139,6 +139,8 @@ class MouseController:
         )
         
         for action_id, action_data in sorted_actions:
+            if not action_data.get('enabled', True):
+                continue
             # 액션 중심점 계산
             center = matcher.get_action_center(template_id, action_id, location, scale_info)
             if center is None:

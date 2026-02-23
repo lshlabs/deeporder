@@ -17,6 +17,7 @@ from pathlib import Path
 import mss
 import os
 from datetime import datetime
+from utils.path_manager import resource_path
 
 # EasyOCR import with fallback
 try:
@@ -565,7 +566,7 @@ def save_result_image(screenshot, location, app_name, button_type, timestamp):
     """결과 이미지 저장"""
     try:
         # 결과 디렉토리 생성 (timestamp 폴더 포함)
-        result_dir = Path("test_results") / timestamp
+        result_dir = resource_path("test_results", timestamp)
         result_dir.mkdir(parents=True, exist_ok=True)
         
         # 파일명 생성

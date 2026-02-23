@@ -5,9 +5,10 @@ import json
 import os
 from PyQt6.QtGui import QImage, QPixmap
 import time
+from utils.path_manager import data_path as managed_data_path, resolve_project_path
 
 class ImageMatcher:
-    def __init__(self, threshold=0.7, data_file_path="deeporder/utils/data.json"):
+    def __init__(self, threshold=0.7, data_file_path=None):
         """
         이미지 매칭 모듈 초기화
         
@@ -16,7 +17,7 @@ class ImageMatcher:
             data_file_path (str): data.json 파일 경로
         """
         self.threshold = threshold
-        self.data_file_path = data_file_path
+        self.data_file_path = str(managed_data_path() if data_file_path is None else data_file_path)
         self.templates = {}  # 로드된 템플릿 이미지 저장 (key: template_id, value: cv2_image)
         self.template_paths = {}  # 템플릿 이미지 경로 저장
         self.template_sizes = {}  # 원본 템플릿 크기 저장 (data.json 기준)
@@ -50,14 +51,15 @@ class ImageMatcher:
                 
                 # 원본 이미지 경로 확인
                 image_path = original_template.get('image')
-                if not image_path or not os.path.exists(image_path):
+                resolved_path = resolve_project_path(image_path)
+                if not resolved_path or not resolved_path.exists():
                     continue
                 
                 # 템플릿 ID 생성 (매크로 키 + 액션 키)
                 template_id = f"{macro_key}_{original_action_key}"
                 
                 # 템플릿 경로 저장
-                self.template_paths[template_id] = image_path
+                self.template_paths[template_id] = str(resolved_path)
                 
                 # 원본 이미지 크기 저장 (data.json의 coordinates 기준)
                 coords = original_template.get('coordinates', [0, 0, 0, 0])

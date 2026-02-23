@@ -2,11 +2,12 @@ from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt, QRect, QPoint
 from PyQt6.QtGui import QPainter, QPen, QColor, QPixmap
 from utils.temp_manager import TempManager
+from utils.path_manager import ui_path
 
 class WizardStep2Dialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/Step2Window.ui', self)
+        uic.loadUi(str(ui_path("Step2Window.ui")), self)
         
         self.current_rect = None
         self.current_drag_label = None

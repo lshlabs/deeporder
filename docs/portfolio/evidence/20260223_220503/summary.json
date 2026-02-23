@@ -1,0 +1,25 @@
+{
+  "evidence_dir": "docs/portfolio/evidence/20260223_220503",
+  "gui": {
+    "macro_used": "M1",
+    "gui_timeout_capture": "docs/portfolio/evidence/20260223_220503/gui_timeout_log.png",
+    "gui_f12_capture": "docs/portfolio/evidence/20260223_220503/gui_f12_log.png",
+    "gui_log": "docs/portfolio/evidence/20260223_220503/gui_log.txt"
+  },
+  "delivery_samples": {
+    "baemin": {
+      "sample_source": "test_results/09231919/baemin_detection.png",
+      "status": "ok",
+      "detected_app": "baemin",
+      "buttons_found_keys": [
+        "accept",
+        "reject"
+      ]
+    },
+    "coupang": {
+      "sample_source": "test_results/09252104/coupang_detection.png",
+      "status": "system_exit",
+      "system_exit_code": 1
+    }
+  }
+}

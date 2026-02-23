@@ -3,11 +3,12 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QIcon
 from pathlib import Path
 from utils.data_manager import DataManager
+from utils.path_manager import resolve_project_path, ui_path
 
 class ImageDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, macro_key=None, action_key=None):
         super().__init__(parent)
-        uic.loadUi('ui/ImageWindow.ui', self)
+        uic.loadUi(str(ui_path("ImageWindow.ui")), self)
         
         # 기본 설정
         self.data_manager = DataManager.get_instance()
@@ -71,8 +72,9 @@ class ImageDialog(QtWidgets.QDialog):
         
         # 이미지 설정
         image_path = self.action_data['image']
-        if Path(image_path).exists():
-            pixmap = QPixmap(image_path)
+        resolved_path = resolve_project_path(image_path)
+        if resolved_path and Path(resolved_path).exists():
+            pixmap = QPixmap(str(resolved_path))
             self.label_preview.setPixmap(pixmap.scaled(
                 self.label_preview.size(),
                 Qt.AspectRatioMode.KeepAspectRatio,

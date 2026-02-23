@@ -1,5 +1,7 @@
+import logging
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence, QShortcut
 from pathlib import Path
 import sys
 import shutil
@@ -8,13 +10,15 @@ from dialog.action_wizard_dialog import ActionWizardDialog
 from dialog.action_dialog import ActionDialog
 from dialog.main_setting_dialog import MainSettingDialog
 from utils.data_manager import DataManager
+from utils.logger_ui import bind_text_widget
+from utils.path_manager import ui_path
 from core_functions.macro_runner import MacroRunner
 
 class MainDialog(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('ui/MainWindow.ui', self)
-        self.setFixedSize(500, 570)
+        uic.loadUi(str(ui_path("MainWindow.ui")), self)
+        self.setFixedSize(500, 700)
         
         # MacroRunner 인스턴스 생성
         self.macro_runner = MacroRunner()
@@ -25,6 +29,8 @@ class MainDialog(QtWidgets.QMainWindow):
         self.macro_name_to_key = {}
         
         self.init_ui()
+        self.init_log_ui()
+        self.init_shortcuts()
         self.connect_signals()
         self.load_macro_list()
 
@@ -45,6 +51,21 @@ class MainDialog(QtWidgets.QMainWindow):
         self.button_edit = self.findChild(QtWidgets.QPushButton, 'button_edit')
         self.button_copy = self.findChild(QtWidgets.QPushButton, 'button_copy')
         self.button_setting = self.findChild(QtWidgets.QPushButton, 'button_setting')
+        self.textBrowser_log = self.findChild(QtWidgets.QPlainTextEdit, 'textBrowser_log')
+
+    def init_log_ui(self):
+        self.ui_logger = logging.getLogger("deeporder.runtime")
+        self.ui_logger.setLevel(logging.INFO)
+        self.ui_logger.propagate = False
+        self.log_handler = None
+        if self.textBrowser_log:
+            self.textBrowser_log.setReadOnly(True)
+            self.log_handler = bind_text_widget(self.textBrowser_log, logger_name="deeporder.runtime", max_lines=500)
+            self.ui_logger.handlers = [self.log_handler]
+
+    def init_shortcuts(self):
+        self.shortcut_stop_all = QShortcut(QKeySequence("F12"), self)
+        self.shortcut_stop_all.activated.connect(self.stop_all_running_macros)
 
     def connect_signals(self):
         """시그널 연결"""
@@ -203,6 +224,10 @@ class MainDialog(QtWidgets.QMainWindow):
         """설정 버튼 클릭 시 실행"""
         dialog = MainSettingDialog(self)
         dialog.show()
+
+    def stop_all_running_macros(self):
+        self.macro_runner.stop_all()
+        self.on_log_message("F12 긴급 중단: 실행 중 매크로 중지 요청")
 
     def label_run_clicked(self, event):
         """실행 라벨 클릭 시 실행"""
@@ -374,8 +399,8 @@ class MainDialog(QtWidgets.QMainWindow):
 
     def on_log_message(self, message):
         """로그 메시지 시그널 핸들러"""
-        # 로그 표시 UI가 있다면 여기서 처리
-        print(f"로그: {message}")  # 임시로 콘솔에 출력
+        self.ui_logger.info(message)
+        print(f"로그: {message}")
 
     def load_macro_list(self):
         """데이터에서 매크로 리스트 로드"""

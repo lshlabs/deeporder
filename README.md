@@ -1,48 +1,21 @@
 # DeepOrder
 
-PyQt6 기반 GUI + 화면 인식(OpenCV/EasyOCR) + 자동 클릭(pyautogui)로 구성된  
-배달앱 주문 처리 자동화 실험 프로젝트입니다.
+PyQt6 기반 GUI + 화면 인식(OpenCV/EasyOCR) + 자동 클릭(pyautogui)로 구성된 배달앱 주문 처리 자동화 프로젝트입니다.
 
-이 저장소는 **완료형 제품보다는 기능 검증/개선 중인 개발 단계 프로젝트**에 가깝습니다.
+이번 정리에서는 PoC 성격의 코드를 포트폴리오 설명에 유리한 형태로 리팩토링했습니다.
 
-## 현재 상태
+## 이번 개선 핵심
 
-- 메인 GUI는 동작 가능: `dialog/main_dialog.py`
-- 매크로 데이터는 JSON 파일(`utils/data.json`)에 저장
-- 실행 엔진은 `MacroRunner` + `ScreenMonitor` + `MouseController`
-- 이미지 매칭은 기존 OpenCV 매처(`core_functions/image_matcher.py`)와  
-  EasyOCR 기반 매처(`image_matcher_easyocr.py`)가 공존
-- 성능/정확도 실험 스크립트 다수 포함 (`ocr_test.py`, `test_*`, `performance_demo.py`)
-
-## 기술 스택
-
-- Python 3.x
-- PyQt6
-- OpenCV (`opencv-python`)
-- EasyOCR
-- mss
-- pyautogui
-- numpy
-- Pillow
-
-## 디렉터리 구조
-
-```text
-deeporder/
-├─ dialog/                    # 메인 UI/다이얼로그 로직
-├─ ui/                        # Qt Designer .ui 및 변환 파일
-├─ core_functions/            # 매크로 실행, 화면 모니터링, 클릭 제어
-├─ utils/                     # DataManager/TempManager/설정 데이터
-├─ image_matcher_easyocr.py   # EasyOCR 기반 배달앱 특화 매처
-├─ ocr_test.py                # OCR 기반 모니터링 실험 스크립트
-├─ test_*.py                  # 기능 검증용 테스트 스크립트
-├─ img/                       # 템플릿/디버깅 이미지
-└─ test_results/              # 테스트 결과 이미지
-```
+- 경로 관리 통합: `utils/path_manager.py` (실행 위치/패키징 고려)
+- GUI 로그 패널 추가: 메인 화면에서 실행 로그 확인 가능
+- `MacroRunner` 안정화: 타임아웃/재시도 옵션 + 정리 로직 강화
+- 비전 엔진 추상화: `core_functions/vision_engine.py` (OCR/Template 전략 경계)
+- 구조 정리: 실험 스크립트 `experiments/`, 수동 테스트 `tests/manual/`
+- Windows 패키징 준비물 추가: `DeepOrder.spec`, `scripts/build_windows.bat`
 
 ## 빠른 실행
 
-### 1) 가상환경 준비 (예시)
+### 1) 가상환경 준비
 
 ```bash
 cd /Users/mac/Documents/GitHub/myGit/deeporder
@@ -53,51 +26,63 @@ source .venv/bin/activate
 ### 2) 의존성 설치
 
 ```bash
-pip install pyqt6 opencv-python numpy mss pyautogui pillow easyocr
+pip install -r requirements.txt
 ```
 
-### 3) 메인 GUI 실행
+### 3) 실행
 
 ```bash
-python3 dialog/main_dialog.py
+python3 main.py
 ```
 
-### 4) OCR 모니터링 실험 실행(선택)
+## 디렉터리 구조 (요약)
 
-```bash
-python3 ocr_test.py
+```text
+deeporder/
+├─ main.py                    # 앱 엔트리포인트 (패키징용)
+├─ dialog/                    # 메인 UI/다이얼로그 로직
+├─ ui/                        # Qt Designer .ui 파일
+├─ core_functions/            # 실행 엔진, 마우스 제어, 비전 엔진
+├─ utils/                     # 데이터/임시/경로/로그 유틸리티
+├─ experiments/               # 성능 비교/실험 스크립트
+├─ tests/manual/              # 수동 검증용 스크립트
+├─ docs/portfolio/            # 포트폴리오 설명 문서
+├─ img/                       # 템플릿/디버그 이미지
+└─ DeepOrder.spec             # Windows 패키징 준비 파일
 ```
 
 ## 핵심 모듈
 
-- `dialog/main_dialog.py`  
-  메인 화면, 매크로 목록 관리, 실행/중지 UI 이벤트 처리
+- `dialog/main_dialog.py`: 메인 화면, 매크로 리스트/실행/중지, GUI 로그 출력
+- `core_functions/macro_runner.py`: 매크로 스레드 실행, 타임아웃/재시도, 디버그 저장
+- `core_functions/vision_engine.py`: OCR/Template matcher 추상화 레이어
+- `core_functions/image_matcher.py`: 템플릿 매칭 + 액션 좌표 계산
+- `image_matcher_easyocr.py`: EasyOCR 기반 배달앱 버튼 탐지
+- `utils/data_manager.py`: 매크로 데이터 로드/저장, 하위호환 경로 정규화
+- `utils/path_manager.py`: 리소스 경로/패키징 경로 통합
 
-- `core_functions/macro_runner.py`  
-  매크로별 스레드 실행, 템플릿 탐색 재시도, 액션 클릭 실행, 디버깅 이미지 저장
+## 포트폴리오 문서
 
-- `core_functions/image_matcher.py`  
-  템플릿-액션 데이터 로드, 화면 캡처, 템플릿 매칭, 스케일 좌표 변환
+- `docs/portfolio/BEFORE_AFTER.md`
+- `docs/portfolio/VALIDATION_SCENARIOS.md`
+- `docs/portfolio/PACKAGING_WINDOWS.md`
 
-- `image_matcher_easyocr.py`  
-  EasyOCR 싱글톤 리더 재사용, 배달앱별 ROI/키워드 기반 버튼 탐지
+## 수동 검증 스크립트 예시
 
-- `utils/data_manager.py`  
-  매크로/설정 JSON 저장, 위저드 액션 생성, 매크로 복제와 이미지 경로 갱신
+```bash
+python3 -m tests.manual.test_easyocr_button_detection
+python3 -m tests.manual.test_roi_limited_detection
+```
 
-## 알려진 제약
+## 실험 스크립트 예시
 
-- 경로 의존 코드가 일부 존재하여 실행 위치에 따라 오류가 날 수 있음  
-  (예: `uic.loadUi('ui/MainWindow.ui', self)`)
-- 로그 UI가 아직 미완성이라 일부 로그는 콘솔 출력에 의존
-- 테스트/실험 스크립트와 운영 코드가 함께 있어 구조 정리가 더 필요
-- 플랫폼/해상도 별 마우스 제어 안정성 추가 검증 필요
+```bash
+python3 -m experiments.ocr_test
+python3 -m experiments.performance_demo
+```
 
-## 다음 정리 우선순위 제안
+## 알려진 한계
 
-1. 경로/설정 관리 통합 (하드코딩 경로 제거)
-2. 실행 로그 패널 UI 추가
-3. EasyOCR/Template matcher 선택 전략 통일
-4. 테스트 스크립트와 운영 코드 분리
-5. requirements 파일 고정 및 실행 가이드 표준화
-
+- 실제 배달앱 환경에서 대규모 실사용 QA는 아직 별도 검증 필요
+- EasyOCR 오프라인 배포(모델 포함) 최적화는 후속 작업 필요
+- 전역 시스템 단축키는 미구현 (현재는 메인 창 포커스 기준 `F12`)

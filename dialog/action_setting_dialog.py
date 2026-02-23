@@ -1,10 +1,11 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
+from utils.path_manager import ui_path
 
 class ActionSettingDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/ActionsettingWindow.ui', self)
+        uic.loadUi(str(ui_path("ActionsettingWindow.ui")), self)
         self.init_ui()
         self.connect_signals()
         

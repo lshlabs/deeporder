@@ -1,13 +1,13 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QIcon, QIntValidator
-from pathlib import Path
 from utils.data_manager import DataManager
+from utils.path_manager import resolve_project_path, ui_path
 
 class ActionPreviewDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, macro_key=None, action_key=None):
         super().__init__(parent)
-        uic.loadUi('ui/ActionpreviewWindow.ui', self)
+        uic.loadUi(str(ui_path("ActionpreviewWindow.ui")), self)
         
         # 기본 설정
         self.data_manager = DataManager.get_instance()
@@ -65,12 +65,14 @@ class ActionPreviewDialog(QtWidgets.QDialog):
         
         # 이미지 설정
         if 'image' in self.action_data:
-            pixmap = QPixmap(self.action_data['image'])
-            self.label_preview.setPixmap(pixmap.scaled(
-                self.label_preview.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            ))
+            image_path = resolve_project_path(self.action_data['image'])
+            if image_path:
+                pixmap = QPixmap(str(image_path))
+                self.label_preview.setPixmap(pixmap.scaled(
+                    self.label_preview.size(),
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                ))
         
         # 시간 조정 동작 여부 설정
         #if 'is_time_action' in self.action_data:

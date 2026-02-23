@@ -17,11 +17,12 @@ from dialog.action_delay_dialog import ActionDelayDialog
 from dialog.action_setting_dialog import ActionSettingDialog
 from dialog.action_preview_dialog import ActionPreviewDialog
 from utils.data_manager import DataManager
+from utils.path_manager import ui_path
 
 class ActionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, macro_key=""):
         super().__init__(parent)
-        uic.loadUi('ui/ActionWindow.ui', self)
+        uic.loadUi(str(ui_path("ActionWindow.ui")), self)
         self.setFixedSize(500, 570)
         self.macro_key = macro_key
         self.data_manager = DataManager.get_instance()

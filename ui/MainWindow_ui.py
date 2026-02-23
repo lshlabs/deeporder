@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,13 +17,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QLabel,
     QLineEdit, QListView, QListWidget, QListWidgetItem,
-    QMainWindow, QPushButton, QSizePolicy, QWidget)
+    QMainWindow, QPlainTextEdit, QPushButton, QSizePolicy,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(500, 570)
+        MainWindow.resize(500, 700)
         MainWindow.setMaximumSize(QSize(500, 700))
         font = QFont()
         font.setFamilies([u"Arial"])
@@ -39,7 +40,7 @@ class Ui_MainWindow(object):
         self.mainwindow.setFont(font1)
         self.frame_main = QFrame(self.mainwindow)
         self.frame_main.setObjectName(u"frame_main")
-        self.frame_main.setGeometry(QRect(10, 10, 480, 550))
+        self.frame_main.setGeometry(QRect(10, 10, 480, 680))
         self.frame_main.setFont(font)
         self.frame_main.setStyleSheet(u"background: white;\n"
 "border:1px solid black;\n"
@@ -216,9 +217,20 @@ class Ui_MainWindow(object):
 "}")
         self.label_stop.setLineWidth(0)
         self.label_stop.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.textBrowser_log = QPlainTextEdit(self.frame_main)
+        self.textBrowser_log.setObjectName(u"textBrowser_log")
+        self.textBrowser_log.setGeometry(QRect(30, 530, 420, 100))
+        self.textBrowser_log.setReadOnly(True)
+        self.textBrowser_log.setStyleSheet(u"QPlainTextEdit {\n"
+"    color: black;\n"
+"    background-color: #FAFAFA;\n"
+"    border: 1px solid #BDBDBD;\n"
+"    border-radius: 5px;\n"
+"    padding: 4px;\n"
+"}")
         self.label_version = QLabel(self.frame_main)
         self.label_version.setObjectName(u"label_version")
-        self.label_version.setGeometry(QRect(10, 530, 130, 10))
+        self.label_version.setGeometry(QRect(10, 655, 130, 10))
         font6 = QFont()
         font6.setFamilies([u"Arial"])
         font6.setPointSize(9)
@@ -287,6 +299,7 @@ class Ui_MainWindow(object):
         self.button_edit.setText(QCoreApplication.translate("MainWindow", u"\uc218\uc815", None))
         self.label_run.setText(QCoreApplication.translate("MainWindow", u"RUN", None))
         self.label_stop.setText(QCoreApplication.translate("MainWindow", u"STOP", None))
+        self.textBrowser_log.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\uc2e4\ud589 \ub85c\uadf8\uac00 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4.", None))
         self.label_version.setText(QCoreApplication.translate("MainWindow", u"v0.1.3-dev 250227", None))
         self.button_copy.setText(QCoreApplication.translate("MainWindow", u"\ubcf5\uc81c", None))
         self.button_setting.setText(QCoreApplication.translate("MainWindow", u"\uc124\uc815", None))

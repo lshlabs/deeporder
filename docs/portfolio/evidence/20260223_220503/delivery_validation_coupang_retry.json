@@ -1,0 +1,8 @@
+{
+  "sample_source": "test_results/09252037/coupang_reject.png",
+  "detected_app": "coupang",
+  "status": "ok",
+  "buttons_found_keys": [
+    "accept"
+  ]
+}

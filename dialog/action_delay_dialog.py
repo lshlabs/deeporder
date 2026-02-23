@@ -1,11 +1,12 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QDoubleValidator
+from utils.path_manager import ui_path
 
 class ActionDelayDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        uic.loadUi('ui/ActiondelayWindow.ui', self)
+        uic.loadUi(str(ui_path("ActiondelayWindow.ui")), self)
         self.init_ui()
         self.connect_signals()
         
