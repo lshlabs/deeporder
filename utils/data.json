@@ -1,200 +1,242 @@
 {
     "macro_list": {
         "M1": {
-            "name": "테스트1",
-            "actions": {
-                "A1": {
-                    "name": "원본 이미지",
-                    "type": "image",
-                    "number": 1,
-                    "image": "img/테스트1/A1.png",
-                    "priority": false,
-                    "coordinates": [
-                        0,
-                        0,
-                        738,
-                        668
-                    ],
-                    "enabled": true
-                },
-                "A2": {
-                    "name": "- 버튼 이미지",
-                    "type": "image",
-                    "number": 2,
-                    "image": "img/테스트1/A2.png",
-                    "priority": false,
-                    "coordinates": [
-                        27,
-                        185,
-                        70,
-                        70
-                    ],
-                    "enabled": true
-                },
-                "A3": {
-                    "name": "+ 버튼 이미지",
-                    "type": "image",
-                    "number": 3,
-                    "image": "img/테스트1/A3.png",
-                    "priority": false,
-                    "coordinates": [
-                        297,
-                        181,
-                        71,
-                        77
-                    ],
-                    "enabled": true
-                },
-                "A4": {
-                    "name": "예상시간 이미지",
-                    "type": "image",
-                    "number": 4,
-                    "image": "img/테스트1/A4.png",
-                    "priority": false,
-                    "coordinates": [
-                        153,
-                        215,
-                        87,
-                        52
-                    ],
-                    "enabled": true
-                },
-                "A5": {
-                    "name": "거부버튼 이미지",
-                    "type": "image",
-                    "number": 5,
-                    "image": "img/테스트1/A5.png",
-                    "priority": false,
-                    "coordinates": [
-                        17,
-                        278,
-                        177,
-                        58
-                    ],
-                    "enabled": true
-                },
-                "A6": {
-                    "name": "접수버튼 이미지",
-                    "type": "image",
-                    "number": 6,
-                    "image": "img/테스트1/A6.png",
-                    "priority": false,
-                    "coordinates": [
-                        200,
-                        278,
-                        178,
-                        60
-                    ],
-                    "enabled": true
-                }
-            },
-            "program": "Google Chrome",
+            "name": "testmacro1",
+            "program": null,
+            "capture_source_image": "img\\testmacro1\\capture_source.png",
             "settings": {
                 "matcher_mode": "ocr",
                 "max_retries": 10,
                 "retry_interval_sec": 0.5,
-                "template_timeout_sec": 10.0
-            }
-        },
-        "M2": {
-            "name": "test2",
-            "actions": {
-                "A1": {
-                    "name": "원본 이미지",
-                    "type": "image",
-                    "number": 1,
-                    "image": "img/test2/A1.png",
-                    "priority": false,
-                    "coordinates": [
-                        0,
-                        0,
-                        738,
-                        668
-                    ],
+                "template_timeout_sec": 10.0,
+                "repeat_count": 3,
+                "repeat_delay_sec": 2.0
+            },
+            "actions": {},
+            "items": {
+                "I1": {
+                    "id": "I1",
+                    "name": "거부 버튼",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1559,
+                        "y": 1140,
+                        "width": 118,
+                        "height": 90
+                    },
+                    "capture_rect": {
+                        "x": 1559,
+                        "y": 1140,
+                        "width": 118,
+                        "height": 90
+                    },
+                    "preview_image": "img\\testmacro1\\I1.png",
                     "enabled": true
                 },
-                "A2": {
-                    "name": "- 버튼 이미지",
-                    "type": "image",
-                    "number": 2,
-                    "image": "img/test2/A2.png",
-                    "priority": false,
-                    "coordinates": [
-                        47,
-                        364,
-                        145,
-                        134
-                    ],
+                "I2": {
+                    "id": "I2",
+                    "name": "접수 버튼",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1978,
+                        "y": 1135,
+                        "width": 118,
+                        "height": 98
+                    },
+                    "capture_rect": {
+                        "x": 1978,
+                        "y": 1135,
+                        "width": 118,
+                        "height": 98
+                    },
+                    "preview_image": "img\\testmacro1\\I2.png",
                     "enabled": true
                 },
-                "A3": {
-                    "name": "+ 버튼 이미지",
-                    "type": "image",
-                    "number": 3,
-                    "image": "img/test2/A3.png",
-                    "priority": false,
-                    "coordinates": [
-                        581,
-                        364,
-                        148,
-                        140
-                    ],
+                "I3": {
+                    "id": "I3",
+                    "name": "+버튼",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1899,
+                        "y": 1161,
+                        "width": 32,
+                        "height": 45
+                    },
+                    "capture_rect": {
+                        "x": 1899,
+                        "y": 1161,
+                        "width": 32,
+                        "height": 45
+                    },
+                    "preview_image": "img\\testmacro1\\I3.png",
                     "enabled": true
                 },
-                "A4": {
-                    "name": "예상시간 이미지",
-                    "type": "image",
-                    "number": 4,
-                    "image": "img/test2/A4.png",
-                    "priority": false,
-                    "coordinates": [
-                        290,
-                        417,
-                        181,
-                        103
-                    ],
+                "I4": {
+                    "id": "I4",
+                    "name": "-버튼",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1724,
+                        "y": 1160,
+                        "width": 35,
+                        "height": 45
+                    },
+                    "capture_rect": {
+                        "x": 1724,
+                        "y": 1160,
+                        "width": 35,
+                        "height": 45
+                    },
+                    "preview_image": "img\\testmacro1\\I4.png",
                     "enabled": true
                 },
-                "A5": {
-                    "name": "거부버튼 이미지",
-                    "type": "image",
-                    "number": 5,
-                    "image": "img/test2/A5.png",
-                    "priority": false,
-                    "coordinates": [
-                        14,
-                        272,
-                        180,
-                        67
-                    ],
+                "I5": {
+                    "id": "I5",
+                    "name": "15~20분",
+                    "item_type": "text",
+                    "screen_rect": {
+                        "x": 1757,
+                        "y": 1149,
+                        "width": 140,
+                        "height": 69
+                    },
+                    "capture_rect": {
+                        "x": 1757,
+                        "y": 1149,
+                        "width": 140,
+                        "height": 69
+                    },
+                    "preview_image": "img\\testmacro1\\I5.png",
                     "enabled": true
                 },
-                "A6": {
-                    "name": "접수버튼 이미지",
-                    "type": "image",
-                    "number": 6,
-                    "image": "img/test2/A6.png",
-                    "priority": false,
-                    "coordinates": [
-                        195,
-                        270,
-                        185,
-                        72
-                    ],
+                "I6": {
+                    "id": "I6",
+                    "name": "배민1",
+                    "item_type": "text",
+                    "screen_rect": {
+                        "x": 1738,
+                        "y": 944,
+                        "width": 83,
+                        "height": 44
+                    },
+                    "capture_rect": {
+                        "x": 1738,
+                        "y": 944,
+                        "width": 83,
+                        "height": 44
+                    },
+                    "preview_image": "img\\testmacro1\\I6.png",
                     "enabled": true
                 }
             },
-            "program": "Designer",
-            "settings": {
-                "matcher_mode": "ocr",
-                "max_retries": 10,
-                "retry_interval_sec": 0.5,
-                "template_timeout_sec": 10.0
-            }
+            "presets": {
+                "P1": {
+                    "id": "P1",
+                    "name": "testmacro1",
+                    "preset_trigger": {
+                        "trigger_type": "text_roi",
+                        "screen_rect": {
+                            "x": 1757,
+                            "y": 1149,
+                            "width": 140,
+                            "height": 69
+                        },
+                        "expected_color": null,
+                        "color_tolerance": 10,
+                        "expected_text": "15~20분",
+                        "text_match_mode": "contains",
+                        "ocr_confidence_min": 0.6,
+                        "enabled": true
+                    },
+                    "steps": [
+                        {
+                            "step_type": "item",
+                            "item_id": "I1",
+                            "click_count": 1,
+                            "order": 1,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I2",
+                            "click_count": 1,
+                            "order": 2,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I3",
+                            "click_count": 2,
+                            "order": 3,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I4",
+                            "click_count": 3,
+                            "order": 4,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I5",
+                            "click_count": 1,
+                            "order": 5,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I6",
+                            "click_count": 1,
+                            "order": 6,
+                            "enabled": true,
+                            "delay_sec": null,
+                            "note_text": null
+                        }
+                    ]
+                }
+            },
+            "default_preset_id": "P1",
+            "macro_trigger": {
+                "trigger_type": "pixel_color",
+                "screen_rect": {
+                    "x": 1740,
+                    "y": 949,
+                    "width": 79,
+                    "height": 36
+                },
+                "expected_color": {
+                    "r": 66,
+                    "g": 177,
+                    "b": 182
+                },
+                "color_tolerance": 10,
+                "expected_text": null,
+                "text_match_mode": "contains",
+                "ocr_confidence_min": 0.6,
+                "enabled": true
+            },
+            "schema_version": 2
         }
     },
     "settings_main": {
-        "resolution": "1680 x 1050",
-        "custom": true
+        "resolution": "2560 x 1440",
+        "custom": false,
+        "setup_completed": true,
+        "capture_hotkey": "Ctrl+Shift+F10",
+        "expected_resolution": "2560 x 1440",
+        "dpi_scale_locked": true,
+        "run_hotkey": "Shift+F11",
+        "stop_hotkey": "Alt+F12"
     }
 }

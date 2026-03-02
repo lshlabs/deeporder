@@ -1,212 +1,255 @@
-from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
+from __future__ import annotations
+
+import ctypes
 from pathlib import Path
-import sys
-import shutil
-sys.path.append(str(Path(__file__).parents[1]))
+
+from PIL import ImageGrab
+from PyQt6 import QtCore, QtWidgets
+
 from dialog.action_dialog import ActionDialog
-from dialog.wizard_step2_dialog import WizardStep2Dialog
-from dialog.wizard_step3_dialog import WizardStep3Dialog
-from utils.temp_manager import TempManager
+from dialog.region_capture_dialog import RegionCaptureDialog
 from utils.data_manager import DataManager
-from utils.path_manager import ui_path
-from PIL import Image
+
 
 class ActionWizardDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, title_text=""):
         super().__init__(parent)
-        uic.loadUi(str(ui_path("ActionWizardWindow.ui")), self)
-        self.setFixedSize(500, 470)
         self.title_text = title_text
-        self.is_new_macro = not isinstance(parent, ActionDialog)  # 호출 출처 구분
-        self.macro_key = None  # action_dialog에서 전달받을 매크로 키
-        self.init_ui()
-        self.connect_signals()
-        
-    def init_ui(self):
-        """UI 요소 초기화"""
-        # 라벨들
-        self.label_title1 = self.findChild(QtWidgets.QLabel, 'label_title1')
-        self.label_title2 = self.findChild(QtWidgets.QLabel, 'label_title2')
-        self.label_title3 = self.findChild(QtWidgets.QLabel, 'label_title3')
-        
-        # 라벨들에 텍스트 설정
-        self.label_title1.setText(self.title_text)
-        self.label_title2.setText(self.title_text)
-        self.label_title3.setText(self.title_text)
-        
-        # === Page 1 요소들 ===
-        self.init_page1_ui()
-        
-        # === Page 2 요소들 ===
-        self.init_page2_ui()
-        
-        # === Page 3 요소들 ===
-        self.init_page3_ui()
-        
-        # button 초기 비활성화
-        self.button_next1.setEnabled(False)
-        self.button_next2.setEnabled(False)
-        self.button_save.setEnabled(False)
-        
-    def init_page1_ui(self):
-        """Page 1 UI 요소 초기화"""
-        # 프레임
-        self.frame1 = self.findChild(QtWidgets.QFrame, 'frame1')
-        # 라벨들
-        self.label_step1 = self.findChild(QtWidgets.QLabel, 'label_step1')
-        self.label_step1_text = self.findChild(QtWidgets.QLabel, 'label_step1_text')
-        self.label_preview1 = self.findChild(QtWidgets.QLabel, 'label_preview1')
-        # 버튼들
-        self.button_next1 = self.findChild(QtWidgets.QPushButton, 'button_next1')
-        self.button_cancel = self.findChild(QtWidgets.QPushButton, 'button_cancel')
-        
-    def init_page2_ui(self):
-        """Page 2 UI 요소 초기화"""
-        # 프레임
-        self.frame2 = self.findChild(QtWidgets.QFrame, 'frame2')
-        # 라벨들
-        self.label_step2 = self.findChild(QtWidgets.QLabel, 'label_step2')
-        self.label_step2_text = self.findChild(QtWidgets.QLabel, 'label_step2_text')
-        self.label_preview2 = self.findChild(QtWidgets.QLabel, 'label_preview2')
-        self.label_tip1 = self.findChild(QtWidgets.QLabel, 'label_tip1')
-        # 버튼들
-        self.button_next2 = self.findChild(QtWidgets.QPushButton, 'button_next2')
-        self.button_prev1 = self.findChild(QtWidgets.QPushButton, 'button_prev1')
-        
-    def init_page3_ui(self):
-        """Page 3 UI 요소 초기화"""
-        # 프레임
-        self.frame3 = self.findChild(QtWidgets.QFrame, 'frame3')
-        # 라벨들
-        self.label_step3 = self.findChild(QtWidgets.QLabel, 'label_step3')
-        self.label_step3_text = self.findChild(QtWidgets.QLabel, 'label_step3_text')
-        self.label_preview3 = self.findChild(QtWidgets.QLabel, 'label_preview3')
-        self.label_tip2 = self.findChild(QtWidgets.QLabel, 'label_tip2')
-        # 버튼들
-        self.button_save = self.findChild(QtWidgets.QPushButton, 'button_save')
-        self.button_prev2 = self.findChild(QtWidgets.QPushButton, 'button_prev2')
-    
-    def connect_signals(self):
-        """시그널 연결"""
-        # Page 1 버튼
-        self.button_next1.clicked.connect(lambda: self.change_page(1))  # 0 -> 1
-        self.button_cancel.clicked.connect(self.close)
-        
-        # Page 2 버튼
-        self.button_next2.clicked.connect(lambda: self.change_page(2))  # 1 -> 2
-        self.button_prev1.clicked.connect(lambda: self.change_page(0))  # 1 -> 0
-        
-        # Page 3 버튼
-        self.button_save.clicked.connect(self.save_action)
-        self.button_prev2.clicked.connect(lambda: self.change_page(1))  # 2 -> 1
-        
-        self.label_preview1.mousePressEvent = self.label_preview1_clicked
-        self.label_preview2.mousePressEvent = self.label_preview2_clicked
-        self.label_preview3.mousePressEvent = self.label_preview3_clicked
-    
-    def change_page(self, index: int):
-        """페이지 전환
-        Args:
-            index (int): 이동할 페이지 인덱스 (0, 1, 2)
-        """
-        current_index = self.stackedWidget.currentIndex()
-        
-        # 현재 페이지가 0이고 다음 페이지로 이동하려는 경우
-        if current_index == 0 and index == 1:
-            # label_preview1에 이미지가 없으면 이동 불가
-            if self.label_preview1.pixmap() is None:
-                return
-        
-        self.stackedWidget.setCurrentIndex(index)
-    
-    def save_action(self):
-        """저장 버튼 클릭 시 실행"""
-        data_manager = DataManager.get_instance()
-        temp_manager = TempManager.get_instance()
-        
-        if self.is_new_macro:
-            # 새로운 매크로 생성을 위해 새로운 매크로 키 생성 후 기본 데이터 등록
-            macro_keys = data_manager._data['macro_list'].keys()
-            next_num = 1
-            while f"M{next_num}" in macro_keys:
-                next_num += 1
-            macro_key = f"M{next_num}"
-            
-            data_manager._data['macro_list'][macro_key] = {
-                'name': self.title_text,
-            }
-            # DataManager에서 내부적으로 기본 액션 생성 및 painted 이미지 복사를 수행하도록 위임
-            data_manager.create_wizard_actions(macro_key)
-        else:
-            # 기존 매크로에 새로운 액션 추가 (DataManager 내부에서 처리)
-            data_manager.add_wizard_actions(self.macro_key)
-        
-        # 임시 데이터 정리
-        temp_manager.clear_temp_data()
-        
-        # 창 닫기
+        self.data_manager = DataManager.get_instance()
+        self.screenshot_path = None
+        self.macro_key = None
+        self._waiting_for_hotkey = False
+        self._hotkey_text, self._hotkey_combo = self._resolve_capture_hotkey()
+        self._build_ui()
+        self._connect_signals()
+
+    def _resolve_capture_hotkey(self):
+        settings = self.data_manager._data.get("settings_main", {})
+        hotkey = str(settings.get("capture_hotkey") or "F1").strip()
+        return self._parse_hotkey_combo(hotkey, "F1")
+
+    def _parse_hotkey_combo(self, hotkey_text: str, fallback_text: str):
+        alias_map = {
+            "CTRL": ("Ctrl", [0x11]),
+            "CONTROL": ("Ctrl", [0x11]),
+            "ALT": ("Alt", [0x12]),
+            "SHIFT": ("Shift", [0x10]),
+            "META": ("Meta", [0x5B, 0x5C]),
+            "WIN": ("Meta", [0x5B, 0x5C]),
+            "WINDOWS": ("Meta", [0x5B, 0x5C]),
+        }
+        special_keys = {
+            "TAB": ("Tab", 0x09),
+            "SPACE": ("Space", 0x20),
+            "ENTER": ("Enter", 0x0D),
+            "RETURN": ("Enter", 0x0D),
+            "ESC": ("Esc", 0x1B),
+            "ESCAPE": ("Esc", 0x1B),
+        }
+
+        tokens = [token.strip() for token in str(hotkey_text or "").split("+") if token.strip()]
+        if not tokens:
+            tokens = [fallback_text]
+
+        display_parts = []
+        modifiers = []
+        primary = None
+
+        for token in tokens:
+            normalized = token.upper()
+            if normalized in alias_map:
+                label, group = alias_map[normalized]
+                if label not in display_parts:
+                    display_parts.append(label)
+                    modifiers.append(group)
+                continue
+
+            if normalized.startswith("F") and normalized[1:].isdigit():
+                number = int(normalized[1:])
+                if 1 <= number <= 24:
+                    display_parts.append(f"F{number}")
+                    primary = [0x6F + number]
+                    continue
+
+            if normalized in special_keys:
+                label, vk = special_keys[normalized]
+                display_parts.append(label)
+                primary = [vk]
+                continue
+
+            if len(normalized) == 1:
+                code = ord(normalized)
+                if 48 <= code <= 57 or 65 <= code <= 90:
+                    display_parts.append(normalized)
+                    primary = [code]
+                    continue
+
+        if primary is None:
+            return self._parse_hotkey_combo(fallback_text, fallback_text)
+        return "+".join(display_parts), {"modifiers": modifiers, "primary": primary}
+
+    def _is_hotkey_pressed(self):
+        try:
+            user32 = ctypes.windll.user32
+            for group in self._hotkey_combo.get("modifiers", []):
+                if not any(user32.GetAsyncKeyState(vk) & 0x8000 for vk in group):
+                    return False
+            return any(user32.GetAsyncKeyState(vk) & 0x8000 for vk in self._hotkey_combo.get("primary", []))
+        except Exception:
+            return True
+
+    def _monitor_intro_text(self):
+        return (
+            "감시모드 시작을 누르면 프로그램이 최소화됩니다.\n"
+            f"최소화된 상태에서 {self._hotkey_text}을 눌러 전체 화면을 캡처합니다."
+        )
+
+    def _build_ui(self):
+        self.setWindowTitle("감시모드 진입")
+        self.setFixedSize(460, 260)
+        self.setStyleSheet(
+            "QDialog { background: #f3f4f6; }"
+            "QFrame#Card { background: white; border: 1px solid #d1d5db; border-radius: 14px; }"
+            "QLabel { color: #111827; font-family: 'Malgun Gothic'; }"
+            "QPushButton {"
+            "  min-height: 36px;"
+            "  padding: 0 14px;"
+            "  border-radius: 10px;"
+            "  border: 1px solid #c7ccd4;"
+            "  background: #ffffff;"
+            "  color: #111827;"
+            "  font: 9pt 'Malgun Gothic';"
+            "}"
+            "QPushButton#PrimaryButton {"
+            "  background: #0ea5e9;"
+            "  border: 1px solid #0284c7;"
+            "  color: white;"
+            "  font-weight: 700;"
+            "}"
+            "QPushButton:disabled { background: #dbeafe; color: #6b7280; border-color: #bfdbfe; }"
+        )
+
+        root = QtWidgets.QVBoxLayout(self)
+        root.setContentsMargins(18, 18, 18, 18)
+
+        card = QtWidgets.QFrame(self)
+        card.setObjectName("Card")
+        root.addWidget(card)
+
+        card_layout = QtWidgets.QVBoxLayout(card)
+        card_layout.setContentsMargins(22, 20, 22, 18)
+        card_layout.setSpacing(14)
+
+        chip = QtWidgets.QLabel("MONITOR MODE")
+        chip.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        chip.setFixedWidth(120)
+        chip.setStyleSheet(
+            "QLabel { background: #e0f2fe; color: #0369a1; border-radius: 10px; padding: 6px 10px; font: 700 8pt 'Malgun Gothic'; }"
+        )
+        card_layout.addWidget(chip, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
+
+        title = QtWidgets.QLabel(self.title_text)
+        title.setWordWrap(True)
+        title.setStyleSheet("QLabel { font: 700 13pt 'Malgun Gothic'; }")
+        card_layout.addWidget(title)
+
+        self.status_label = QtWidgets.QLabel(
+            self._monitor_intro_text()
+        )
+        self.status_label.setWordWrap(True)
+        self.status_label.setStyleSheet("QLabel { font: 9pt 'Malgun Gothic'; line-height: 1.4; }")
+        card_layout.addWidget(self.status_label)
+
+        hint = QtWidgets.QLabel("이미지 업로드 없이 바로 화면을 캡처하고, 이어서 영역 선택으로 이동합니다.")
+        hint.setWordWrap(True)
+        hint.setStyleSheet("QLabel { color: #4b5563; font: 8pt 'Malgun Gothic'; }")
+        card_layout.addWidget(hint)
+
+        spacer = QtWidgets.QSpacerItem(20, 8, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        card_layout.addItem(spacer)
+
+        actions = QtWidgets.QHBoxLayout()
+        actions.setSpacing(10)
+        actions.addStretch(1)
+
+        self.button_cancel = QtWidgets.QPushButton("취소")
+        actions.addWidget(self.button_cancel)
+
+        self.button_start = QtWidgets.QPushButton("감시모드 시작")
+        self.button_start.setObjectName("PrimaryButton")
+        actions.addWidget(self.button_start)
+
+        card_layout.addLayout(actions)
+
+    def _connect_signals(self):
+        self.button_start.clicked.connect(self.enter_monitor_mode)
+        self.button_cancel.clicked.connect(self.reject)
+
+    def enter_monitor_mode(self):
+        self._waiting_for_hotkey = True
+        self.button_start.setEnabled(False)
+        self.button_start.setText(f"{self._hotkey_text} 대기 중")
+        self.status_label.setText(
+            "프로그램이 최소화되었습니다.\n"
+            f"최소화된 상태에서 {self._hotkey_text}을 눌러 캡처하세요."
+        )
+        if self.parent():
+            self.parent().showMinimized()
+        self.showMinimized()
+        QtCore.QTimer.singleShot(120, self._wait_for_f1)
+
+    def _wait_for_f1(self):
+        if not self._waiting_for_hotkey:
+            return
+        pressed = self._is_hotkey_pressed()
+        if pressed:
+            self._waiting_for_hotkey = False
+            QtCore.QTimer.singleShot(120, self._capture_and_open_regions)
+            return
+        QtCore.QTimer.singleShot(50, self._wait_for_f1)
+
+    def _reset_wait_state(self):
+        self.button_start.setEnabled(True)
+        self.button_start.setText("감시모드 시작")
+        self._hotkey_text, self._hotkey_combo = self._resolve_capture_hotkey()
+        self.status_label.setText(self._monitor_intro_text())
+
+    def _capture_and_open_regions(self):
+        try:
+            screenshot = ImageGrab.grab(all_screens=True)
+        except Exception as e:
+            if self.parent():
+                self.parent().showNormal()
+            self.showNormal()
+            self._reset_wait_state()
+            QtWidgets.QMessageBox.warning(self, "캡처 오류", f"화면 캡처에 실패했습니다.\n{e}")
+            return
+
+        temp_dir = Path(__file__).resolve().parents[1] / "temp"
+        temp_dir.mkdir(exist_ok=True)
+        self.screenshot_path = str((temp_dir / "monitor_capture.png").resolve())
+        screenshot.save(self.screenshot_path)
+
+        if self.parent():
+            self.parent().showNormal()
+            self.parent().raise_()
+        self.showNormal()
+        self.raise_()
+
+        dialog = RegionCaptureDialog(self.screenshot_path, self)
+        if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted or not dialog.capture_regions:
+            self._reset_wait_state()
+            return
+
+        self.macro_key = self.data_manager.create_macro_from_capture(
+            self.title_text,
+            dialog.capture_regions,
+            self.screenshot_path,
+        )
+        editor = ActionDialog(self.parent(), self.macro_key)
+        editor.exec()
         self.accept()
-        
-        # 새로운 매크로인 경우에만 ActionDialog 열기
-        if self.is_new_macro:
-            dialog = ActionDialog(self.parent(), macro_key=macro_key)
-            dialog.show()
-        
-    def label_preview1_clicked(self, event):
-        """이미지 선택 및 미리보기"""
-        file_dialog = QtWidgets.QFileDialog(self)
-        file_dialog.setWindowTitle("이미지 선택")
-        file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.ExistingFile)
-        file_dialog.setNameFilter("Images (*.png *.xpm *.jpg *.jpeg *.bmp)")
-        
-        if file_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            file_path = file_dialog.selectedFiles()[0]
-            pixmap = QPixmap(file_path)
-            
-            # TempManager에 step1 이미지 저장
-            temp_manager = TempManager.get_instance()
-            image = Image.open(file_path)
-            temp_manager.save_temp_image(image, 1)  # step1 이미지로 저장
-            
-            # 각 label에 이미지 설정
-            for label in [self.label_preview1, self.label_preview2, self.label_preview3]:
-                scaled_pixmap = pixmap.scaled(
-                    label.size(),
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-                label.setPixmap(scaled_pixmap)
-            
-            # 버튼 활성화 및 스타일시트 변경
-            self.button_next1.setEnabled(True)
-            next_style = self.button_next1.styleSheet().replace('darkgray', '#f0f0f0')
-            self.button_next1.setStyleSheet(next_style)
 
-    def label_preview2_clicked(self, event):
-        """Step2 다이얼로그 열기"""
-        if self.label_preview2.pixmap():
-            dialog = WizardStep2Dialog(self)
-            # 원본 이미지 설정 (label_preview1의 pixmap 사용)
-            dialog.original_pixmap = self.label_preview1.pixmap().copy()
-            dialog.display_pixmap = dialog.original_pixmap.copy()
-            dialog.label_preview.setPixmap(dialog.display_pixmap)
-            dialog.update_preview()  # 저장된 드래그 영역 표시
-            dialog.show()
-
-    def label_preview3_clicked(self, event):
-        """Step3 다이얼로그 열기"""
-        if self.label_preview3.pixmap():
-            dialog = WizardStep3Dialog(self)
-            # 원본 이미지 설정 (label_preview1의 pixmap 사용)
-            dialog.original_pixmap = self.label_preview1.pixmap().copy()
-            dialog.display_pixmap = dialog.original_pixmap.copy()
-            dialog.label_preview.setPixmap(dialog.display_pixmap)
-            dialog.update_preview()  # 저장된 드래그 영역 표시
-            dialog.show()
-
-    def closeEvent(self, event):
-        """다이얼로그가 닫힐 때 임시 데이터 삭제"""
-        TempManager.get_instance().clear_temp_data()
-        super().closeEvent(event)
+    def reject(self):
+        self._waiting_for_hotkey = False
+        super().reject()

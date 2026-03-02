@@ -143,3 +143,5 @@ Thumbs.db
 temp/
 *.tmp
 *.temp
+
+/old

@@ -55,7 +55,6 @@
     <property name="styleSheet">
      <string notr="true">background: white;
 border:1px solid black;
-border-radius: 5px;
 </string>
     </property>
     <property name="frameShape">
@@ -97,10 +96,6 @@ border-radius: 5px;
 	background-color: darkgray;
 	color: white;
 	border: none;
-	border-top-left-radius :5px;
-	border-top-right-radius : 5px;
-	border-bottom-left-radius : 0px;
-	border-bottom-right-radius : 0px;
 }</string>
      </property>
      <property name="lineWidth">
@@ -124,15 +119,14 @@ border-radius: 5px;
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
+       <family>맑은 고딕</family>
+       <pointsize>10</pointsize>
        <kerning>true</kerning>
       </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QListWidget {
                 color: black;
-                border-radius: 5px;
             }
 QListWidget::item {
                 height: 30px;
@@ -193,7 +187,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -234,7 +228,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
        <bold>false</bold>
        <hintingpreference>PreferVerticalHinting</hintingpreference>
@@ -285,7 +279,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
        <bold>false</bold>
        <hintingpreference>PreferVerticalHinting</hintingpreference>
@@ -336,7 +330,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
        <bold>false</bold>
        <hintingpreference>PreferVerticalHinting</hintingpreference>
@@ -483,8 +477,10 @@ QListWidget::item {
        <height>100</height>
       </rect>
      </property>
-     <property name="readOnly">
-      <bool>true</bool>
+     <property name="font">
+      <font>
+       <family>맑은 고딕</family>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QPlainTextEdit {
@@ -494,6 +490,9 @@ QListWidget::item {
     border-radius: 5px;
     padding: 4px;
 }</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
      <property name="placeholderText">
       <string>실행 로그가 여기에 표시됩니다.</string>
@@ -544,7 +543,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
        <bold>false</bold>
        <hintingpreference>PreferVerticalHinting</hintingpreference>
@@ -595,7 +594,7 @@ QListWidget::item {
      </property>
      <property name="font">
       <font>
-       <family>Arial</family>
+       <family>맑은 고딕</family>
        <pointsize>10</pointsize>
        <bold>false</bold>
        <hintingpreference>PreferVerticalHinting</hintingpreference>

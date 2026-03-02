@@ -34,10 +34,25 @@ class GUILogHandler(logging.Handler):
         self.text_widget.setTextCursor(cursor)
 
 
+class CategoryFormatter(logging.Formatter):
+    def format(self, record):
+        message = record.getMessage()
+        category = record.levelname
+        if message.startswith("[") and "]" in message:
+            end_idx = message.find("]")
+            tag = message[1:end_idx].strip()
+            rest = message[end_idx + 1 :].lstrip()
+            if tag:
+                category = tag
+                message = rest
+        timestamp = self.formatTime(record, self.datefmt)
+        return f"{timestamp} | {category} | {message}"
+
+
 def bind_text_widget(widget, logger_name: str = "deeporder.ui", max_lines: int = 500) -> GUILogHandler:
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     handler = GUILogHandler(widget, max_lines=max_lines)
-    handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s", "%H:%M:%S"))
+    handler.setFormatter(CategoryFormatter("%(message)s", "%H:%M:%S"))
     logger.addHandler(handler)
     return handler

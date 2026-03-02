@@ -1,4 +1,6 @@
 import time
+import time
+
 import pyautogui
 
 class MouseController:
