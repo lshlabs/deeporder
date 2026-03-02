@@ -3,9 +3,12 @@ import copy
 
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
+from dialog.item_edit_dialog import ItemEditDialog as ExternalItemEditDialog
+from dialog.macro_settings_dialog import MacroSettingsDialog as ExternalMacroSettingsDialog
 from dialog.trigger_dialog import TriggerDialog
 from utils.data_manager import DataManager
 from utils.path_manager import ui_path
+from dialog.widgets.preset_ribbon import PresetRibbon as ExternalPresetRibbon
 
 
 class PresetTabLabel(QtWidgets.QPushButton):
@@ -303,7 +306,7 @@ class ActionDialog(QtWidgets.QDialog):
             direct_children = initial_page.findChildren(QtWidgets.QWidget, options=QtCore.Qt.FindChildOption.FindDirectChildrenOnly)
             if direct_children:
                 self.content_container = direct_children[0]
-        self.preset_ribbon = PresetRibbon(self.card)
+        self.preset_ribbon = ExternalPresetRibbon(self.card)
         if card_layout is not None:
             card_layout.setSpacing(0)
             card_layout.removeWidget(self.tab_widget)
@@ -556,7 +559,7 @@ class ActionDialog(QtWidgets.QDialog):
                 self.reload_everything()
             return
 
-        dialog = ItemEditDialog(item, int(step.get("click_count", 1) or 1), self)
+        dialog = ExternalItemEditDialog(item, int(step.get("click_count", 1) or 1), self)
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         name, clicks, rect = dialog.get_values()
@@ -613,7 +616,7 @@ class ActionDialog(QtWidgets.QDialog):
 
     def btn_program(self):
         settings = self.macro_data.setdefault("settings", {})
-        dialog = MacroSettingsDialog(settings, self)
+        dialog = ExternalMacroSettingsDialog(settings, self)
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         repeat_count, repeat_delay = dialog.values()
@@ -663,7 +666,7 @@ class ActionDialog(QtWidgets.QDialog):
             if not source_item:
                 return
             new_item = copy.deepcopy(source_item)
-            new_item_id = self.data_manager._next_item_id(self.macro_data)
+            new_item_id = self.data_manager.get_next_item_id(self.macro_key)
             new_item["id"] = new_item_id
             new_item["name"] = self._build_copied_item_name(str(new_item.get("name") or "항목"))
             self.macro_data.setdefault("items", {})[new_item_id] = new_item
@@ -728,8 +731,7 @@ class ActionDialog(QtWidgets.QDialog):
     def _restore_snapshot(self):
         if self._committed or self._macro_snapshot is None:
             return
-        self.data_manager._data.get("macro_list", {})[self.macro_key] = copy.deepcopy(self._macro_snapshot)
-        self.data_manager.save_data()
+        self.data_manager.restore_macro(self.macro_key, self._macro_snapshot)
         self.macro_data = self.data_manager.get_macro(self.macro_key)
 
     def reject(self):

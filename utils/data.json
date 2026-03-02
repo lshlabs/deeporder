@@ -227,6 +227,236 @@
                 "enabled": true
             },
             "schema_version": 2
+        },
+        "M2": {
+            "name": "배민",
+            "program": null,
+            "capture_source_image": "img\\배민\\capture_source.png",
+            "settings": {
+                "matcher_mode": "ocr",
+                "max_retries": 10,
+                "retry_interval_sec": 0.5,
+                "template_timeout_sec": 10.0,
+                "repeat_count": 3,
+                "repeat_delay_sec": 3.0000000000000013
+            },
+            "actions": {},
+            "items": {
+                "I1": {
+                    "id": "I1",
+                    "name": "거부",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1563,
+                        "y": 1142,
+                        "width": 121,
+                        "height": 87
+                    },
+                    "capture_rect": {
+                        "x": 1563,
+                        "y": 1142,
+                        "width": 121,
+                        "height": 87
+                    },
+                    "preview_image": "img\\배민\\I1.png",
+                    "enabled": true
+                },
+                "I2": {
+                    "id": "I2",
+                    "name": "-",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1717,
+                        "y": 1156,
+                        "width": 44,
+                        "height": 52
+                    },
+                    "capture_rect": {
+                        "x": 1717,
+                        "y": 1156,
+                        "width": 44,
+                        "height": 52
+                    },
+                    "preview_image": "img\\배민\\I2.png",
+                    "enabled": true
+                },
+                "I3": {
+                    "id": "I3",
+                    "name": "+",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1891,
+                        "y": 1154,
+                        "width": 49,
+                        "height": 63
+                    },
+                    "capture_rect": {
+                        "x": 1891,
+                        "y": 1154,
+                        "width": 49,
+                        "height": 63
+                    },
+                    "preview_image": "img\\배민\\I3.png",
+                    "enabled": true
+                },
+                "I4": {
+                    "id": "I4",
+                    "name": "접수",
+                    "item_type": "button",
+                    "screen_rect": {
+                        "x": 1984,
+                        "y": 1135,
+                        "width": 108,
+                        "height": 96
+                    },
+                    "capture_rect": {
+                        "x": 1984,
+                        "y": 1135,
+                        "width": 108,
+                        "height": 96
+                    },
+                    "preview_image": "img\\배민\\I4.png",
+                    "enabled": true
+                },
+                "I5": {
+                    "id": "I5",
+                    "name": "텍스트 5",
+                    "item_type": "text",
+                    "screen_rect": {
+                        "x": 1759,
+                        "y": 1160,
+                        "width": 137,
+                        "height": 45
+                    },
+                    "capture_rect": {
+                        "x": 1759,
+                        "y": 1160,
+                        "width": 137,
+                        "height": 45
+                    },
+                    "preview_image": "img\\배민\\I5.png",
+                    "enabled": true
+                },
+                "I6": {
+                    "id": "I6",
+                    "name": "배민1",
+                    "item_type": "text",
+                    "screen_rect": {
+                        "x": 1736,
+                        "y": 948,
+                        "width": 83,
+                        "height": 40
+                    },
+                    "capture_rect": {
+                        "x": 1736,
+                        "y": 948,
+                        "width": 83,
+                        "height": 40
+                    },
+                    "preview_image": "img\\배민\\I6.png",
+                    "enabled": true
+                }
+            },
+            "presets": {
+                "P1": {
+                    "id": "P1",
+                    "name": "배민",
+                    "preset_trigger": {
+                        "trigger_type": "text_roi",
+                        "screen_rect": {
+                            "x": 1759,
+                            "y": 1160,
+                            "width": 137,
+                            "height": 45
+                        },
+                        "expected_color": null,
+                        "color_tolerance": 10,
+                        "expected_text": "텍스트 5",
+                        "text_match_mode": "contains",
+                        "ocr_confidence_min": 0.6,
+                        "enabled": true
+                    },
+                    "steps": [
+                        {
+                            "step_type": "item",
+                            "item_id": "I1",
+                            "click_count": 1,
+                            "order": 1,
+                            "enabled": true,
+                            "delay_sec": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I2",
+                            "click_count": 1,
+                            "order": 2,
+                            "enabled": true,
+                            "delay_sec": null
+                        },
+                        {
+                            "step_type": "delay",
+                            "item_id": null,
+                            "click_count": 1,
+                            "order": 3,
+                            "enabled": true,
+                            "delay_sec": 0.5
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I3",
+                            "click_count": 1,
+                            "order": 4,
+                            "enabled": true,
+                            "delay_sec": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I4",
+                            "click_count": 1,
+                            "order": 5,
+                            "enabled": true,
+                            "delay_sec": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I6",
+                            "click_count": 1,
+                            "order": 6,
+                            "enabled": true,
+                            "delay_sec": null
+                        },
+                        {
+                            "step_type": "item",
+                            "item_id": "I5",
+                            "click_count": 1,
+                            "order": 7,
+                            "enabled": true,
+                            "delay_sec": null
+                        }
+                    ]
+                }
+            },
+            "default_preset_id": "P1",
+            "macro_trigger": {
+                "trigger_type": "pixel_color",
+                "screen_rect": {
+                    "x": 1738,
+                    "y": 946,
+                    "width": 84,
+                    "height": 41
+                },
+                "expected_color": {
+                    "r": 151,
+                    "g": 224,
+                    "b": 225
+                },
+                "color_tolerance": 10,
+                "expected_text": null,
+                "text_match_mode": "contains",
+                "ocr_confidence_min": 0.6,
+                "enabled": true
+            },
+            "schema_version": 2
         }
     },
     "settings_main": {
@@ -236,7 +466,7 @@
         "capture_hotkey": "Ctrl+Shift+F10",
         "expected_resolution": "2560 x 1440",
         "dpi_scale_locked": true,
-        "run_hotkey": "Shift+F11",
+        "run_hotkey": "Alt+F11",
         "stop_hotkey": "Alt+F12"
     }
 }

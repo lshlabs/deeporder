@@ -2,8 +2,6 @@ import ctypes
 import ctypes.wintypes
 import logging
 import os
-import shutil
-from pathlib import Path
 
 from PyQt6 import QtCore, QtWidgets, uic
 from PyQt6.QtGui import QKeySequence, QShortcut
@@ -13,6 +11,7 @@ from dialog.action_dialog import ActionDialog
 from dialog.action_wizard_dialog import ActionWizardDialog
 from dialog.main_setting_dialog import MainSettingDialog
 from utils.data_manager import DataManager
+from utils.hotkey_utils import parse_hotkey_for_register
 from utils.logger_ui import bind_text_widget
 from utils.path_manager import ui_path
 
@@ -23,13 +22,6 @@ RUNNING_SUFFIX = " (실행 중)"
 WM_HOTKEY = 0x0312
 HOTKEY_ID_RUN = 1
 HOTKEY_ID_STOP = 2
-MOD_ALT = 0x0001
-MOD_CONTROL = 0x0002
-MOD_SHIFT = 0x0004
-MOD_WIN = 0x0008
-MOD_NOREPEAT = 0x4000
-
-
 class GlobalHotkeyEventFilter(QtCore.QAbstractNativeEventFilter):
     def __init__(self, callback):
         super().__init__()
@@ -155,56 +147,10 @@ class MainDialog(QtWidgets.QMainWindow):
                 pass
         self._registered_hotkey_ids.clear()
 
-    def _parse_hotkey_registration(self, hotkey_text: str, fallback: str):
-        text = str(hotkey_text or "").strip() or fallback
-        modifiers = 0
-        key_code = None
-        special_keys = {
-            "TAB": 0x09,
-            "SPACE": 0x20,
-            "ENTER": 0x0D,
-            "RETURN": 0x0D,
-            "ESC": 0x1B,
-            "ESCAPE": 0x1B,
-        }
-
-        for token in [part.strip() for part in text.split("+") if part.strip()]:
-            normalized = token.upper()
-            if normalized in {"CTRL", "CONTROL"}:
-                modifiers |= MOD_CONTROL
-                continue
-            if normalized == "ALT":
-                modifiers |= MOD_ALT
-                continue
-            if normalized == "SHIFT":
-                modifiers |= MOD_SHIFT
-                continue
-            if normalized in {"META", "WIN", "WINDOWS"}:
-                modifiers |= MOD_WIN
-                continue
-            if normalized.startswith("F") and normalized[1:].isdigit():
-                number = int(normalized[1:])
-                if 1 <= number <= 24:
-                    key_code = 0x6F + number
-                    continue
-            if normalized in special_keys:
-                key_code = special_keys[normalized]
-                continue
-            if len(normalized) == 1:
-                code = ord(normalized)
-                if 48 <= code <= 57 or 65 <= code <= 90:
-                    key_code = code
-
-        if key_code is None and text != fallback:
-            return self._parse_hotkey_registration(fallback, fallback)
-        if key_code is None:
-            key_code = 0x7A
-        return modifiers | MOD_NOREPEAT, key_code
-
     def _register_global_hotkey(self, hotkey_id: int, hotkey_text: str, fallback: str):
         if os.name != "nt":
             return False
-        modifiers, key_code = self._parse_hotkey_registration(hotkey_text, fallback)
+        modifiers, key_code = parse_hotkey_for_register(hotkey_text, fallback)
         try:
             registered = bool(ctypes.windll.user32.RegisterHotKey(None, hotkey_id, modifiers, key_code))
         except Exception:
@@ -214,9 +160,8 @@ class MainDialog(QtWidgets.QMainWindow):
         return registered
 
     def refresh_hotkeys(self):
-        settings = self.data_manager._data.get("settings_main", {})
-        run_hotkey = str(settings.get("run_hotkey") or "F11")
-        stop_hotkey = str(settings.get("stop_hotkey") or "F12")
+        run_hotkey = self.data_manager.get_run_hotkey()
+        stop_hotkey = self.data_manager.get_stop_hotkey()
 
         if self.shortcut_run_selected is not None:
             self.shortcut_run_selected.activated.disconnect()
@@ -267,7 +212,7 @@ class MainDialog(QtWidgets.QMainWindow):
         return str(text).endswith(RUNNING_SUFFIX)
 
     def ensure_setup_ready(self):
-        settings = self.data_manager._data["settings_main"]
+        settings = self.data_manager.get_settings()
         current_resolution = self._current_resolution_text()
         needs_setup = not settings.get("setup_completed") or (
             settings.get("expected_resolution") and settings.get("expected_resolution") != current_resolution
@@ -288,9 +233,9 @@ class MainDialog(QtWidgets.QMainWindow):
     def btn_add(self):
         if not self.validate_lineEdit():
             return
-        if not self.data_manager._data["settings_main"].get("setup_completed"):
+        if not self.data_manager.is_setup_completed():
             self.ensure_setup_ready()
-            if not self.data_manager._data["settings_main"].get("setup_completed"):
+            if not self.data_manager.is_setup_completed():
                 return
 
         self.button_add.setFocus()
@@ -320,11 +265,7 @@ class MainDialog(QtWidgets.QMainWindow):
         macro_name = self._strip_running_suffix(current_item.text())
         macro_key = self.macro_name_to_key.get(macro_name)
         if macro_key:
-            macro_folder = self.data_manager.img_path / macro_name
-            if macro_folder.exists():
-                shutil.rmtree(macro_folder)
-            del self.data_manager._data["macro_list"][macro_key]
-            self.data_manager.save_data()
+            self.data_manager.delete_macro(macro_key)
         self.load_macro_list()
 
     def btn_edit(self):
@@ -358,11 +299,12 @@ class MainDialog(QtWidgets.QMainWindow):
     def btn_setting(self):
         dialog = MainSettingDialog(self)
         dialog.exec()
+        self.data_manager = DataManager.get_instance()
         self.refresh_hotkeys()
 
     def stop_all_running_macros(self):
         self.macro_runner.stop_all()
-        stop_hotkey = str(self.data_manager._data.get("settings_main", {}).get("stop_hotkey") or "F12")
+        stop_hotkey = self.data_manager.get_stop_hotkey()
         self.on_log_message(f"{stop_hotkey} 긴급 중지: 실행 중 매크로 중지 요청")
         self.showNormal()
         self.raise_()
@@ -430,7 +372,7 @@ class MainDialog(QtWidgets.QMainWindow):
     def load_macro_list(self):
         self.listWidget.clear()
         self.macro_name_to_key.clear()
-        for key, macro in self.data_manager._data["macro_list"].items():
+        for key, macro in self.data_manager.get_macro_list().items():
             macro_name = macro.get("name", key)
             self.listWidget.addItem(macro_name)
             self.macro_name_to_key[macro_name] = key

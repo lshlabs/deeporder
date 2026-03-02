@@ -10,6 +10,7 @@ from utils.path_manager import data_path as managed_data_path
 from utils.path_manager import img_path as managed_img_path
 from utils.path_manager import make_relative_to_base, resolve_project_path
 from utils.temp_manager import TempManager
+from utils.types import AppSettingsData, MacroData
 
 
 class DataManager:
@@ -30,6 +31,7 @@ class DataManager:
         self._data = self._load_data()
         DataManager._instance = self
 
+    # 기본값 / 로드 / 저장
     def _default_data(self):
         return {
             "macro_list": {},
@@ -195,6 +197,7 @@ class DataManager:
             print(f"데이터 저장 중 오류: {e}")
             return False
 
+    # 내부 ID 생성
     def _next_macro_key(self):
         index = 1
         while f"M{index}" in self._data["macro_list"]:
@@ -213,11 +216,62 @@ class DataManager:
             index += 1
         return f"P{index}"
 
+    # 공용 조회 / 설정 메서드
     def get_macro(self, macro_key: str):
         macro = self._data["macro_list"].get(macro_key)
         if macro:
             self._migrate_legacy_macro(macro)
         return macro
+
+    def restore_macro(self, macro_key: str, macro_snapshot: MacroData) -> bool:
+        self._data["macro_list"][macro_key] = copy.deepcopy(macro_snapshot)
+        return self.save_data()
+
+    def get_macro_list(self) -> dict[str, MacroData]:
+        for macro in self._data["macro_list"].values():
+            if isinstance(macro, dict):
+                self._migrate_legacy_macro(macro)
+        return self._data["macro_list"]
+
+    def get_next_item_id(self, macro_key: str) -> str:
+        macro = self.get_macro(macro_key)
+        if not macro:
+            return "I1"
+        return self._next_item_id(macro)
+
+    def delete_macro(self, macro_key: str) -> bool:
+        macro = self._data["macro_list"].get(macro_key)
+        if not macro:
+            return False
+
+        macro_name = str(macro.get("name") or "")
+        if macro_name:
+            macro_folder = self.img_path / macro_name
+            if macro_folder.exists():
+                shutil.rmtree(macro_folder)
+
+        del self._data["macro_list"][macro_key]
+        return self.save_data()
+
+    def get_settings(self) -> AppSettingsData:
+        return self._data["settings_main"]
+
+    def update_settings(self, **updates) -> bool:
+        settings = self._data["settings_main"]
+        settings.update(updates)
+        return self.save_data()
+
+    def is_setup_completed(self) -> bool:
+        return bool(self.get_settings().get("setup_completed"))
+
+    def get_capture_hotkey(self) -> str:
+        return str(self.get_settings().get("capture_hotkey") or "F1")
+
+    def get_run_hotkey(self) -> str:
+        return str(self.get_settings().get("run_hotkey") or "F11")
+
+    def get_stop_hotkey(self) -> str:
+        return str(self.get_settings().get("stop_hotkey") or "F12")
 
     def get_active_preset(self, macro_key: str, preset_id: str | None = None):
         macro = self.get_macro(macro_key)
@@ -234,6 +288,7 @@ class DataManager:
         preset["steps"] = self._sort_steps(macro, preset.get("steps", []))
         return preset["steps"]
 
+    # 검증 메서드
     def validate_macro_configuration(self, macro_key: str):
         macro = self.get_macro(macro_key)
         if not macro:
@@ -274,6 +329,7 @@ class DataManager:
                 return candidate
             index += 1
 
+    # 매크로 생성 / 복제 / 편집 메서드
     def create_macro_from_capture(self, macro_name: str, capture_regions: list[dict], source_image_path: str | None = None):
         safe_name = self._ensure_unique_macro_name(macro_name.strip() or "새 매크로")
         macro_key = self._next_macro_key()
@@ -533,6 +589,7 @@ class DataManager:
             print(f"원본 이미지 좌표 계산 실패: {e}")
             return None
 
+    # 레거시 호환 메서드
     def _wizard_actions_common(self, macro_key, mapping, starting_action_number):
         temp_manager = TempManager.get_instance()
         macro_folder = self._make_macro_folder(macro_key)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
 from utils.data_manager import DataManager
@@ -9,7 +11,7 @@ class HotkeyLineEdit(QtWidgets.QLineEdit):
         super().__init__(parent)
         self.setReadOnly(True)
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.setPlaceholderText("키 입력")
+        self.setPlaceholderText("키를 누르세요")
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         key = event.key()
@@ -18,7 +20,6 @@ class HotkeyLineEdit(QtWidgets.QLineEdit):
             event.accept()
             return
 
-        modifiers = event.modifiers()
         if key in {
             QtCore.Qt.Key.Key_Control,
             QtCore.Qt.Key.Key_Shift,
@@ -29,7 +30,8 @@ class HotkeyLineEdit(QtWidgets.QLineEdit):
             event.accept()
             return
 
-        parts = []
+        parts: list[str] = []
+        modifiers = event.modifiers()
         if modifiers & QtCore.Qt.KeyboardModifier.ControlModifier:
             parts.append("Ctrl")
         if modifiers & QtCore.Qt.KeyboardModifier.AltModifier:
@@ -39,15 +41,15 @@ class HotkeyLineEdit(QtWidgets.QLineEdit):
         if modifiers & QtCore.Qt.KeyboardModifier.MetaModifier:
             parts.append("Meta")
 
-        text = QtGui.QKeySequence(key).toString()
-        if not text:
-            text = event.text().upper().strip()
-        text = (text or "").strip()
-        if text:
-            if len(text) == 1 or text.upper().startswith("F"):
-                text = text.upper()
-            parts.append(text)
+        key_text = QtGui.QKeySequence(key).toString().strip()
+        if not key_text:
+            key_text = event.text().upper().strip()
+        if key_text:
+            if len(key_text) == 1 or key_text.upper().startswith("F"):
+                key_text = key_text.upper()
+            parts.append(key_text)
             self.setText("+".join(parts))
+
         event.accept()
 
 
@@ -57,13 +59,12 @@ class MainSettingDialog(QtWidgets.QDialog):
         uic.loadUi(str(ui_path("MainsettingWindow.ui")), self)
         self.data_manager = DataManager.get_instance()
         self.force_setup = force_setup
-        self.init_ui()
-        self.connect_signals()
+        self._build_ui()
+        self._connect_signals()
         self.load_settings()
 
-    def init_ui(self):
-        self.resize(360, 390)
-        self.setFixedSize(self.size())
+    def _build_ui(self):
+        self.setFixedSize(380, 400)
         self.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
 
@@ -77,47 +78,92 @@ class MainSettingDialog(QtWidgets.QDialog):
         self.button_save = self.findChild(QtWidgets.QPushButton, "button_save")
         self.button_cancel = self.findChild(QtWidgets.QPushButton, "button_cancel")
 
-        self.frame_main.setGeometry(10, 10, 340, 370)
-        self.button_save.setGeometry(160, 330, 80, 30)
-        self.button_cancel.setGeometry(250, 330, 80, 30)
+        for widget in (self.lineEdit_width, self.lineEdit_height, self.label_width, self.label_height):
+            widget.hide()
 
-        self.init_resolution_list()
-        self.hide_custom_input()
-        self._inject_extra_controls()
+        self.lineEdit_hotkey = HotkeyLineEdit(self.frame_main)
+        self.lineEdit_run_hotkey = HotkeyLineEdit(self.frame_main)
+        self.lineEdit_stop_hotkey = HotkeyLineEdit(self.frame_main)
+        self.label_status = QtWidgets.QLabel(self.frame_main)
+        self.label_status.setWordWrap(True)
+
+        self._apply_styles()
+        self._build_layout()
 
         if self.force_setup:
             self.button_cancel.setEnabled(False)
 
-    def _inject_extra_controls(self):
-        frame = self.frame_main
-        self.label_hotkey = QtWidgets.QLabel("캡처 핫키", frame)
-        self.label_hotkey.setGeometry(30, 128, 80, 24)
-        self.label_hotkey.setStyleSheet("border:none; color:black;")
-
-        self.lineEdit_hotkey = HotkeyLineEdit(frame)
-        self.lineEdit_hotkey.setGeometry(120, 126, 150, 28)
-        self.lineEdit_hotkey.setStyleSheet("color:black; border-radius: 5px; padding-left:3px; background:white;")
-
-        self.label_run_hotkey = QtWidgets.QLabel("실행 핫키", frame)
-        self.label_run_hotkey.setGeometry(30, 168, 80, 24)
-        self.label_run_hotkey.setStyleSheet("border:none; color:black;")
-
-        self.lineEdit_run_hotkey = HotkeyLineEdit(frame)
-        self.lineEdit_run_hotkey.setGeometry(120, 166, 150, 28)
-        self.lineEdit_run_hotkey.setStyleSheet("color:black; border-radius: 5px; padding-left:3px; background:white;")
-
-        self.label_stop_hotkey = QtWidgets.QLabel("종료 핫키", frame)
-        self.label_stop_hotkey.setGeometry(30, 208, 80, 24)
-        self.label_stop_hotkey.setStyleSheet("border:none; color:black;")
-
-        self.lineEdit_stop_hotkey = HotkeyLineEdit(frame)
-        self.lineEdit_stop_hotkey.setGeometry(120, 206, 150, 28)
-        self.lineEdit_stop_hotkey.setStyleSheet("color:black; border-radius: 5px; padding-left:3px; background:white;")
-
-        self.label_status = QtWidgets.QLabel(frame)
-        self.label_status.setGeometry(30, 252, 280, 52)
-        self.label_status.setWordWrap(True)
+    def _apply_styles(self):
+        for hotkey_edit in (self.lineEdit_hotkey, self.lineEdit_run_hotkey, self.lineEdit_stop_hotkey):
+            hotkey_edit.setMinimumHeight(30)
+            hotkey_edit.setStyleSheet(
+                "color:black; border-radius: 5px; padding-left:3px; background:white;"
+            )
         self.label_status.setStyleSheet("border:none; color:black;")
+
+    def _build_layout(self):
+        self.frame_main.setGeometry(10, 10, 360, 380)
+
+        old_layout = self.frame_main.layout()
+        if old_layout is not None:
+            while old_layout.count():
+                old_layout.takeAt(0)
+
+        layout = QtWidgets.QVBoxLayout(self.frame_main)
+        layout.setContentsMargins(20, 20, 20, 16)
+        layout.setSpacing(14)
+
+        self.label_tip.setParent(self.frame_main)
+        layout.addWidget(self.label_tip)
+
+        self.comboBox_resolution.setParent(self.frame_main)
+        self.comboBox_resolution.setMinimumHeight(28)
+        layout.addWidget(self.comboBox_resolution)
+
+        self.custom_resolution_row = QtWidgets.QWidget(self.frame_main)
+        custom_layout = QtWidgets.QHBoxLayout(self.custom_resolution_row)
+        custom_layout.setContentsMargins(0, 0, 0, 0)
+        custom_layout.setSpacing(8)
+        self.label_width.setParent(self.custom_resolution_row)
+        self.lineEdit_width.setParent(self.custom_resolution_row)
+        self.label_height.setParent(self.custom_resolution_row)
+        self.lineEdit_height.setParent(self.custom_resolution_row)
+        custom_layout.addWidget(self.label_width)
+        custom_layout.addWidget(self.lineEdit_width, 1)
+        custom_layout.addWidget(self.label_height)
+        custom_layout.addWidget(self.lineEdit_height, 1)
+        layout.addWidget(self.custom_resolution_row)
+        self.custom_resolution_row.hide()
+
+        layout.addLayout(self._build_labeled_row("캡처 핫키", self.lineEdit_hotkey))
+        layout.addLayout(self._build_labeled_row("실행 핫키", self.lineEdit_run_hotkey))
+        layout.addLayout(self._build_labeled_row("종료 핫키", self.lineEdit_stop_hotkey))
+
+        layout.addWidget(self.label_status)
+        layout.addStretch(1)
+
+        button_row = QtWidgets.QHBoxLayout()
+        button_row.addStretch(1)
+        self.button_save.setParent(self.frame_main)
+        self.button_cancel.setParent(self.frame_main)
+        button_row.addWidget(self.button_save)
+        button_row.addWidget(self.button_cancel)
+        layout.addLayout(button_row)
+
+    def _build_labeled_row(self, label_text: str, editor: QtWidgets.QWidget) -> QtWidgets.QHBoxLayout:
+        row = QtWidgets.QHBoxLayout()
+        row.setSpacing(10)
+        label = QtWidgets.QLabel(label_text, self.frame_main)
+        label.setFixedWidth(70)
+        label.setStyleSheet("border:none; color:black;")
+        row.addWidget(label)
+        row.addWidget(editor, 1)
+        return row
+
+    def _connect_signals(self):
+        self.button_save.clicked.connect(self.save_settings)
+        self.button_cancel.clicked.connect(self.reject)
+        self.comboBox_resolution.currentTextChanged.connect(self.on_resolution_changed)
 
     def init_resolution_list(self):
         resolutions = [
@@ -136,30 +182,17 @@ class MainSettingDialog(QtWidgets.QDialog):
         self.comboBox_resolution.clear()
         self.comboBox_resolution.addItems(resolutions)
 
-    def connect_signals(self):
-        self.button_save.clicked.connect(self.save_settings)
-        self.button_cancel.clicked.connect(self.reject)
-        self.comboBox_resolution.currentTextChanged.connect(self.on_resolution_changed)
-
-    def hide_custom_input(self):
-        self.lineEdit_width.hide()
-        self.lineEdit_height.hide()
-        self.label_width.hide()
-        self.label_height.hide()
-
-    def show_custom_input(self):
-        self.lineEdit_width.show()
-        self.lineEdit_height.show()
-        self.label_width.show()
-        self.label_height.show()
-
-    def on_resolution_changed(self, text):
+    def on_resolution_changed(self, text: str):
         if text == "직접 입력":
-            self.show_custom_input()
+            self.custom_resolution_row.show()
+            self.lineEdit_width.show()
+            self.lineEdit_height.show()
+            self.label_width.show()
+            self.label_height.show()
         else:
-            self.hide_custom_input()
+            self.custom_resolution_row.hide()
 
-    def _current_resolution_text(self):
+    def _current_resolution_text(self) -> str | None:
         screen = QtWidgets.QApplication.primaryScreen()
         if screen is None:
             return None
@@ -167,7 +200,8 @@ class MainSettingDialog(QtWidgets.QDialog):
         return f"{size.width()} x {size.height()}"
 
     def load_settings(self):
-        settings = self.data_manager._data["settings_main"]
+        self.init_resolution_list()
+        settings = self.data_manager.get_settings()
         resolution = settings.get("resolution")
         is_custom = settings.get("custom", False)
 
@@ -178,55 +212,54 @@ class MainSettingDialog(QtWidgets.QDialog):
             width, height = resolution.split("x")
             self.lineEdit_width.setText(width.strip())
             self.lineEdit_height.setText(height.strip())
-            self.show_custom_input()
+            self.custom_resolution_row.show()
         else:
             index = self.comboBox_resolution.findText(resolution)
             if index >= 0:
                 self.comboBox_resolution.setCurrentIndex(index)
 
-        self.lineEdit_hotkey.setText(settings.get("capture_hotkey", "F1"))
-        self.lineEdit_run_hotkey.setText(settings.get("run_hotkey", "F11"))
-        self.lineEdit_stop_hotkey.setText(settings.get("stop_hotkey", "F12"))
-        current_resolution = self._current_resolution_text() or "확인 불가"
-        setup_done = settings.get("setup_completed", False)
-        self.label_tip.setText(f"현재 화면 해상도: {current_resolution}")
-        self.label_status.setText(
-            "초기 설정 완료" if setup_done else "최초 실행 전 안정 동작을 위해 해상도와 핫키를 저장해야 합니다."
-        )
+        self.lineEdit_hotkey.setText(self.data_manager.get_capture_hotkey())
+        self.lineEdit_run_hotkey.setText(self.data_manager.get_run_hotkey())
+        self.lineEdit_stop_hotkey.setText(self.data_manager.get_stop_hotkey())
 
-    def validate_custom_resolution(self):
-        if not self.lineEdit_width.text() or not self.lineEdit_height.text():
-            QtWidgets.QMessageBox.warning(self, "입력 오류", "해상도를 입력해주세요.")
-            return False
-        return True
+        current_resolution = self._current_resolution_text() or "확인 불가"
+        self.label_tip.setText(f"현재 화면 해상도: {current_resolution}")
+        if settings.get("setup_completed"):
+            self.label_status.setText("초기 설정 완료")
+        else:
+            self.label_status.setText("처음 실행 전에는 해상도와 핫키를 먼저 저장해야 합니다.")
+
+    def _validate_resolution_input(self) -> str | None:
+        current_resolution = self.comboBox_resolution.currentText()
+        if not current_resolution:
+            QtWidgets.QMessageBox.warning(self, "입력 오류", "해상도를 선택해 주세요.")
+            return None
+
+        if current_resolution == "직접 입력":
+            width = self.lineEdit_width.text().strip()
+            height = self.lineEdit_height.text().strip()
+            if not width or not height:
+                QtWidgets.QMessageBox.warning(self, "입력 오류", "직접 입력 해상도를 입력해 주세요.")
+                return None
+            return f"{width} x {height}"
+
+        return current_resolution
 
     def save_settings(self):
-        current_resolution = self.comboBox_resolution.currentText()
-        hotkey = self.lineEdit_hotkey.text().strip() or "F1"
-        run_hotkey = self.lineEdit_run_hotkey.text().strip() or "F11"
-        stop_hotkey = self.lineEdit_stop_hotkey.text().strip() or "F12"
-        if not current_resolution:
-            QtWidgets.QMessageBox.warning(self, "입력 오류", "해상도를 선택해주세요.")
+        resolution_text = self._validate_resolution_input()
+        if resolution_text is None:
             return
 
-        settings = self.data_manager._data["settings_main"]
-        if current_resolution == "직접 입력":
-            if not self.validate_custom_resolution():
-                return
-            current_resolution = f"{self.lineEdit_width.text()} x {self.lineEdit_height.text()}"
-            settings["custom"] = True
-        else:
-            settings["custom"] = False
-
-        settings["resolution"] = current_resolution
-        settings["capture_hotkey"] = hotkey
-        settings["run_hotkey"] = run_hotkey
-        settings["stop_hotkey"] = stop_hotkey
-        settings["expected_resolution"] = self._current_resolution_text()
-        settings["dpi_scale_locked"] = True
-        settings["setup_completed"] = bool(settings["expected_resolution"])
-
-        self.data_manager.save_data()
+        self.data_manager.update_settings(
+            resolution=resolution_text,
+            custom=self.comboBox_resolution.currentText() == "직접 입력",
+            capture_hotkey=self.lineEdit_hotkey.text().strip() or "F1",
+            run_hotkey=self.lineEdit_run_hotkey.text().strip() or "F11",
+            stop_hotkey=self.lineEdit_stop_hotkey.text().strip() or "F12",
+            expected_resolution=self._current_resolution_text(),
+            dpi_scale_locked=True,
+            setup_completed=bool(self._current_resolution_text()),
+        )
         self.accept()
 
     def reject(self):

@@ -1,54 +1,88 @@
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
 
 def is_frozen() -> bool:
-    # PyInstaller로 실행되면 sys.frozen = True 가 들어간다.
+    # PyInstaller로 실행하면 sys.frozen 값이 들어갑니다.
     return bool(getattr(sys, "frozen", False))
 
 
-def get_base_dir() -> Path:
-    # 일반 실행: 프로젝트 루트
-    # PyInstaller 실행: 압축 해제된 임시 폴더(_MEIPASS)
+def get_resource_dir() -> Path:
+    # UI 같은 정적 리소스는 번들 내부 경로를 봐야 합니다.
     if is_frozen():
         return Path(getattr(sys, "_MEIPASS"))
     return Path(__file__).resolve().parent.parent
 
 
+def get_runtime_dir() -> Path:
+    # 저장 데이터는 실행 파일 옆 경로를 기준으로 씁니다.
+    if is_frozen():
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent
+
+
 def resource_path(*parts: str) -> Path:
-    # ui/data/img 경로 함수를 만들 때 공통으로 쓰는 헬퍼
-    return get_base_dir().joinpath(*parts)
+    return get_resource_dir().joinpath(*parts)
+
+
+def runtime_path(*parts: str) -> Path:
+    return get_runtime_dir().joinpath(*parts)
 
 
 def ui_path(filename: str) -> Path:
     return resource_path("ui", filename)
 
 
+def _copy_seed_file(source: Path, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists() or not source.exists():
+        return
+    shutil.copy2(source, target)
+
+
+def _copy_seed_tree(source_root: Path, target_root: Path) -> None:
+    if target_root.exists() or not source_root.exists():
+        return
+    shutil.copytree(source_root, target_root)
+
+
 def img_path(*parts: str) -> Path:
-    return resource_path("img", *parts)
+    runtime_root = runtime_path("img")
+    bundled_root = resource_path("img")
+    _copy_seed_tree(bundled_root, runtime_root)
+    runtime_root.mkdir(parents=True, exist_ok=True)
+    return runtime_root.joinpath(*parts)
 
 
 def data_path() -> Path:
-    return resource_path("utils", "data.json")
+    runtime_file = runtime_path("utils", "data.json")
+    bundled_file = resource_path("utils", "data.json")
+    _copy_seed_file(bundled_file, runtime_file)
+    runtime_file.parent.mkdir(parents=True, exist_ok=True)
+    return runtime_file
 
 
 def debug_dir() -> Path:
-    # 디버그 폴더가 없으면 만들어서 저장 코드가 바로 쓸 수 있게 한다.
     path = img_path("debugging")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
 def make_relative_to_base(path: str | Path) -> str:
-    p = Path(path)
-    base_dir = get_base_dir()
-    try:
-        return str(p.resolve().relative_to(base_dir.resolve()))
-    except Exception:
-        # 상대경로 변환이 안 되면 원본 문자열을 그대로 쓴다.
-        return str(p)
+    current_path = Path(path)
+    resource_base = get_resource_dir()
+    runtime_base = get_runtime_dir()
+
+    for base_dir in (runtime_base, resource_base):
+        try:
+            return str(current_path.resolve().relative_to(base_dir.resolve()))
+        except Exception:
+            continue
+
+    return str(current_path)
 
 
 def resolve_project_path(path_value: str | Path | None) -> Path | None:
@@ -59,19 +93,26 @@ def resolve_project_path(path_value: str | Path | None) -> Path | None:
     if path.exists():
         return path
 
-    # 프로젝트 상대경로로도 한 번 시도
-    candidate = resource_path(str(path).replace("\\", "/"))
-    if candidate.exists():
-        return candidate
+    normalized = str(path).replace("\\", "/")
+    runtime_candidate = runtime_path(normalized)
+    if runtime_candidate.exists():
+        return runtime_candidate
 
-    # 다른 PC에서 저장된 예전 절대경로면 deeporder 뒤 경로만 살려서 다시 붙인다.
-    text = str(path).replace("\\", "/")
+    resource_candidate = resource_path(normalized)
+    if resource_candidate.exists():
+        return resource_candidate
+
     for marker in ("/deeporder/", "deeporder/"):
-        if marker in text:
-            suffix = text.split(marker, 1)[1]
-            rebased = resource_path(suffix)
-            if rebased.exists():
-                return rebased
+        if marker not in normalized:
+            continue
+        suffix = normalized.split(marker, 1)[1]
 
-    # 마지막 fallback: 원본 경로를 그대로 반환해서 호출부에서 로그로 확인 가능하게 한다.
+        rebased_runtime = runtime_path(suffix)
+        if rebased_runtime.exists():
+            return rebased_runtime
+
+        rebased_resource = resource_path(suffix)
+        if rebased_resource.exists():
+            return rebased_resource
+
     return path
