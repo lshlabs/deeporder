@@ -17,6 +17,8 @@ from utils.path_manager import ui_path
 
 
 RUNNING_SUFFIX = " (실행 중)"
+IDLE_ACCENT_COLOR = "#6b7280"
+ACTIVE_ACCENT_COLOR = "#0ea5e9"
 
 
 WM_HOTKEY = 0x0312
@@ -77,6 +79,55 @@ class MainDialog(QtWidgets.QMainWindow):
         self.textBrowser_log = self.findChild(QtWidgets.QPlainTextEdit, "textBrowser_log")
         self.button_add.setText("생성")
         self._apply_compact_fonts()
+        self._apply_action_state(is_running=False)
+
+    def _build_action_label_style(self, background_color: str, *, side: str):
+        borders = {
+            "left": (
+                "border-left: 1px solid black;\n"
+                "border-right: none;\n"
+                "border-top-left-radius: 5px;\n"
+                "border-top-right-radius: 0px;\n"
+                "border-bottom-left-radius: 5px;\n"
+                "border-bottom-right-radius: 0px;"
+            ),
+            "right": (
+                "border-left: none;\n"
+                "border-right: 1px solid black;\n"
+                "border-top-left-radius: 0px;\n"
+                "border-top-right-radius: 5px;\n"
+                "border-bottom-left-radius: 0px;\n"
+                "border-bottom-right-radius: 5px;"
+            ),
+        }
+        side_style = borders.get(side, "")
+        return (
+            "QLabel {\n"
+            f"    background-color: {background_color};\n"
+            "    color: white;\n"
+            "    border-top: 1px solid black;\n"
+            "    border-bottom: 1px solid black;\n"
+            f"    {side_style}\n"
+            "}"
+        )
+
+    def _apply_action_state(self, is_running: bool):
+        title_color = ACTIVE_ACCENT_COLOR if is_running else IDLE_ACCENT_COLOR
+        run_color = ACTIVE_ACCENT_COLOR if is_running else IDLE_ACCENT_COLOR
+        stop_color = IDLE_ACCENT_COLOR if is_running else ACTIVE_ACCENT_COLOR
+
+        self.label_title.setStyleSheet(
+            "QLabel {\n"
+            f"    background-color: {title_color};\n"
+            "    color: white;\n"
+            "    border: none;\n"
+            "}"
+        )
+        self.label_run.setStyleSheet(self._build_action_label_style(run_color, side="left"))
+        self.label_stop.setStyleSheet(self._build_action_label_style(stop_color, side="right"))
+
+    def _has_running_macros(self):
+        return any(worker.is_alive() for worker in self.macro_runner.running_macros.values())
 
     def _apply_compact_fonts(self):
         exempt = {self.label_title, self.label_run, self.label_stop}
@@ -305,7 +356,7 @@ class MainDialog(QtWidgets.QMainWindow):
     def stop_all_running_macros(self):
         self.macro_runner.stop_all()
         stop_hotkey = self.data_manager.get_stop_hotkey()
-        self.on_log_message(f"{stop_hotkey} 긴급 중지: 실행 중 매크로 중지 요청")
+        self.on_log_message(f"{stop_hotkey} 중지: 실행 중 매크로 중지 요청")
         self.showNormal()
         self.raise_()
         self.activateWindow()
@@ -322,6 +373,7 @@ class MainDialog(QtWidgets.QMainWindow):
                 return
             if self.macro_runner.start_macro(macro_key):
                 current_item.setText(f"{macro_name}{RUNNING_SUFFIX}")
+                self._apply_action_state(is_running=True)
                 self.showMinimized()
         except Exception as e:
             self.on_log_message(f"RUN 실행 오류: {e}")
@@ -378,6 +430,7 @@ class MainDialog(QtWidgets.QMainWindow):
             self.macro_name_to_key[macro_name] = key
         if self.listWidget.count() > 0:
             self.listWidget.setCurrentRow(0)
+        self._apply_action_state(is_running=self._has_running_macros())
 
     def _minimize_to_tray(self):
         if not getattr(self, "tray_icon", None):
