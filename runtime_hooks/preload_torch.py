@@ -8,8 +8,8 @@ def _prepend_dll_dir(path: Path) -> None:
         return
     try:
         os.add_dll_directory(str(path))
-    except Exception:
-        pass
+    except (AttributeError, OSError):
+        return
     os.environ["PATH"] = str(path) + os.pathsep + os.environ.get("PATH", "")
 
 
@@ -23,5 +23,5 @@ if os.name == "nt":
 
     try:
         import torch  # noqa: F401
-    except Exception as exc:
-        print(f"[runtime_hook] torch preload failed: {exc}", file=sys.stderr)
+    except (ImportError, OSError) as exc:
+        sys.stderr.write(f"[runtime_hook] torch preload failed: {exc}\n")

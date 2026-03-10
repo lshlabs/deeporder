@@ -3,265 +3,12 @@ import copy
 
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
-from dialog.item_edit_dialog import ItemEditDialog as ExternalItemEditDialog
-from dialog.macro_settings_dialog import MacroSettingsDialog as ExternalMacroSettingsDialog
+from dialog.item_edit_dialog import ItemEditDialog
+from dialog.macro_settings_dialog import MacroSettingsDialog
 from dialog.trigger_dialog import TriggerDialog
+from dialog.widgets.preset_ribbon import PresetRibbon
 from utils.data_manager import DataManager
 from utils.path_manager import ui_path
-from dialog.widgets.preset_ribbon import PresetRibbon as ExternalPresetRibbon
-
-
-class PresetTabLabel(QtWidgets.QPushButton):
-    double_clicked = QtCore.pyqtSignal()
-
-    def mouseDoubleClickEvent(self, event):
-        self.double_clicked.emit()
-        event.accept()
-
-
-class PresetRibbon(QtWidgets.QFrame):
-    tab_selected = QtCore.pyqtSignal(str)
-    tab_close_requested = QtCore.pyqtSignal(str)
-    tab_rename_requested = QtCore.pyqtSignal(str)
-    add_requested = QtCore.pyqtSignal()
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("preset_ribbon")
-        self._chip_height = 28
-        self.setFixedHeight(self._chip_height)
-        self.setStyleSheet(
-            "QFrame#preset_ribbon { background: transparent; border: none; }"
-            "QFrame#preset_chip {"
-            "  background: #e4e4e4;"
-            "  border: 1px solid #8e8e8e;"
-            "  border-bottom: none;"
-            "  border-top-left-radius: 7px;"
-            "  border-top-right-radius: 7px;"
-            "  border-bottom-left-radius: 0px;"
-            "  border-bottom-right-radius: 0px;"
-            "}"
-            "QFrame#preset_chip:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }"
-            "QFrame#preset_chip[selected='true'] {"
-            "  background: #ffffff;"
-            "  border-color: #2f2f2f;"
-            "  border-bottom: none;"
-            "}"
-            "QPushButton#preset_label {"
-            "  border: none;"
-            "  background: transparent;"
-            "  color: #111827;"
-            "  padding: 0 10px;"
-            "  min-height: 22px;"
-            "}"
-            "QPushButton#preset_label:hover { color: #0f172a; }"
-            "QPushButton#preset_close {"
-            "  min-width: 13px; max-width: 13px;"
-            "  min-height: 13px; max-height: 13px;"
-            "  padding: 0px;"
-            "  border-radius: 6px;"
-            "  border: none;"
-            "  background: transparent;"
-            "  color: #6b7280;"
-            "}"
-            "QPushButton#preset_close:hover { background: #d7dce3; color: #111827; }"
-            "QPushButton#preset_add {"
-            "  min-width: 28px; max-width: 28px;"
-            "  min-height: 28px; max-height: 28px;"
-            "  padding: 0px;"
-            "  margin: 0px;"
-            "  border-top-left-radius: 7px;"
-            "  border-top-right-radius: 7px;"
-            "  border-bottom-left-radius: 0px;"
-            "  border-bottom-right-radius: 0px;"
-            "  border: 1px solid #8e8e8e;"
-            "  border-bottom: none;"
-            "  background: #e4e4e4;"
-            "  color: #111827;"
-            "}"
-            "QPushButton#preset_add:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }"
-        )
-        layout = QtWidgets.QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(3)
-        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignBottom)
-        self._layout = layout
-        self._widgets = []
-
-    def _clear(self):
-        while self._layout.count():
-            item = self._layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-        self._widgets.clear()
-
-    def set_tabs(self, tabs: list[dict], current_preset_id: str | None, default_preset_id: str | None):
-        self._clear()
-        for tab in tabs:
-            preset_id = tab["id"]
-            chip = QtWidgets.QFrame(self)
-            chip.setObjectName("preset_chip")
-            chip.setProperty("selected", preset_id == current_preset_id)
-            chip.setFixedHeight(self._chip_height)
-
-            chip_layout = QtWidgets.QHBoxLayout(chip)
-            chip_layout.setContentsMargins(0, 0, 5, 0)
-            chip_layout.setSpacing(3)
-            chip_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter)
-
-            label = PresetTabLabel(tab["name"], chip)
-            label.setObjectName("preset_label")
-            label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-            label.setMinimumHeight(22)
-            label.setMaximumHeight(22)
-            label.clicked.connect(lambda _=False, pid=preset_id: self.tab_selected.emit(pid))
-            label.double_clicked.connect(lambda pid=preset_id: self.tab_rename_requested.emit(pid))
-            chip_layout.addWidget(label)
-
-            if preset_id != default_preset_id:
-                close_btn = QtWidgets.QPushButton("x", chip)
-                close_btn.setObjectName("preset_close")
-                close_btn.clicked.connect(lambda _=False, pid=preset_id: self.tab_close_requested.emit(pid))
-                chip_layout.addWidget(close_btn)
-
-            chip.style().unpolish(chip)
-            chip.style().polish(chip)
-            self._layout.addWidget(chip, 0)
-            self._widgets.append(chip)
-
-        add_btn = QtWidgets.QPushButton("+", self)
-        add_btn.setObjectName("preset_add")
-        add_btn.setFixedHeight(self._chip_height)
-        add_btn.clicked.connect(self.add_requested.emit)
-        self._layout.addWidget(add_btn, 0)
-        self._layout.addStretch(1)
-
-
-class ItemEditDialog(QtWidgets.QDialog):
-    def __init__(self, item: dict, click_count: int | None = None, parent=None):
-        super().__init__(parent)
-        self.item = item
-        self._build_ui(click_count)
-
-    def _build_ui(self, click_count: int | None):
-        uic.loadUi(str(ui_path("ItemEditDialog.ui")), self)
-        self.setWindowTitle("항목 수정")
-        self.setModal(True)
-        target_height = 500 if self.item.get("item_type") != "text" else 450
-        self.resize(max(self.width(), 460), target_height)
-
-        self.preview_label = self.findChild(QtWidgets.QLabel, "preview_label")
-        self.line_name = self.findChild(QtWidgets.QLineEdit, "line_name")
-        self.spin_x = self.findChild(QtWidgets.QSpinBox, "spin_x")
-        self.spin_y = self.findChild(QtWidgets.QSpinBox, "spin_y")
-        self.spin_w = self.findChild(QtWidgets.QSpinBox, "spin_w")
-        self.spin_h = self.findChild(QtWidgets.QSpinBox, "spin_h")
-        self.spin_clicks = self.findChild(QtWidgets.QSpinBox, "spin_clicks")
-        self.clicks_label = self.findChild(QtWidgets.QLabel, "clicks_label")
-        self.button_save = self.findChild(QtWidgets.QPushButton, "button_save")
-        self.button_cancel = self.findChild(QtWidgets.QPushButton, "button_cancel")
-
-        preview_path = self.item.get("preview_image")
-        if preview_path:
-            pixmap = QtGui.QPixmap(preview_path)
-            if not pixmap.isNull():
-                preview_size = self.preview_label.size()
-                scaled = pixmap.scaled(
-                    max(160, preview_size.width() - 12),
-                    max(96, preview_size.height() - 12),
-                    QtCore.Qt.AspectRatioMode.KeepAspectRatio,
-                    QtCore.Qt.TransformationMode.SmoothTransformation,
-                )
-                self.preview_label.setPixmap(scaled)
-
-        rect = self.item.get("screen_rect") or self.item.get("capture_rect")
-        for spin in (self.spin_x, self.spin_y, self.spin_w, self.spin_h):
-            spin.setRange(0, 99999)
-            spin.setMinimumHeight(34)
-
-        if rect:
-            self.spin_x.setValue(int(rect.get("x", 0) or 0))
-            self.spin_y.setValue(int(rect.get("y", 0) or 0))
-            self.spin_w.setValue(int(rect.get("width", 0) or 0))
-            self.spin_h.setValue(int(rect.get("height", 0) or 0))
-
-        self.line_name.setText(self.item.get("name", ""))
-        if self.item.get("item_type") != "text":
-            self.spin_clicks.setRange(1, 99)
-            self.spin_clicks.setValue(max(1, int(click_count or 1)))
-        else:
-            self.clicks_label.hide()
-            self.spin_clicks.hide()
-            self.resize(max(self.width(), 460), 450)
-
-        self.button_save.clicked.connect(self.accept)
-        self.button_cancel.clicked.connect(self.reject)
-
-    def get_values(self):
-        name = self.line_name.text().strip() or self.item.get("name", "")
-        clicks = self.spin_clicks.value() if self.spin_clicks is not None else None
-        rect = {
-            "x": self.spin_x.value(),
-            "y": self.spin_y.value(),
-            "width": self.spin_w.value(),
-            "height": self.spin_h.value(),
-        }
-        return name, clicks, rect
-
-
-class MacroSettingsDialog(QtWidgets.QDialog):
-    def __init__(self, macro_settings: dict, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("매크로 설정")
-        self.setModal(True)
-        self.resize(320, 180)
-
-        root = QtWidgets.QVBoxLayout(self)
-        root.setContentsMargins(16, 16, 16, 16)
-        root.setSpacing(12)
-
-        repeat_row = QtWidgets.QHBoxLayout()
-        repeat_label = QtWidgets.QLabel("실행 횟수")
-        repeat_label.setFixedWidth(80)
-        self.spin_repeat = QtWidgets.QSpinBox(self)
-        self.spin_repeat.setRange(0, 9999)
-        self.spin_repeat.setValue(int(macro_settings.get("repeat_count", 1) or 0))
-        repeat_hint = QtWidgets.QLabel("0 = 무한 반복")
-        repeat_hint.setStyleSheet("color:#4b5563;")
-        repeat_row.addWidget(repeat_label)
-        repeat_row.addWidget(self.spin_repeat)
-        repeat_row.addWidget(repeat_hint, 1)
-        root.addLayout(repeat_row)
-
-        delay_row = QtWidgets.QHBoxLayout()
-        delay_label = QtWidgets.QLabel("반복 딜레이")
-        delay_label.setFixedWidth(80)
-        self.spin_delay = QtWidgets.QDoubleSpinBox(self)
-        self.spin_delay.setRange(0.0, 9999.0)
-        self.spin_delay.setDecimals(1)
-        self.spin_delay.setSingleStep(0.1)
-        self.spin_delay.setValue(float(macro_settings.get("repeat_delay_sec", 0.5) or 0.0))
-        delay_suffix = QtWidgets.QLabel("초")
-        delay_row.addWidget(delay_label)
-        delay_row.addWidget(self.spin_delay)
-        delay_row.addWidget(delay_suffix)
-        delay_row.addStretch(1)
-        root.addLayout(delay_row)
-
-        footer = QtWidgets.QHBoxLayout()
-        footer.addStretch(1)
-        self.button_save = QtWidgets.QPushButton("저장", self)
-        self.button_cancel = QtWidgets.QPushButton("취소", self)
-        footer.addWidget(self.button_save)
-        footer.addWidget(self.button_cancel)
-        root.addLayout(footer)
-
-        self.button_save.clicked.connect(self.accept)
-        self.button_cancel.clicked.connect(self.reject)
-
-    def values(self):
-        return self.spin_repeat.value(), self.spin_delay.value()
 
 
 class ActionDialog(QtWidgets.QDialog):
@@ -306,7 +53,7 @@ class ActionDialog(QtWidgets.QDialog):
             direct_children = initial_page.findChildren(QtWidgets.QWidget, options=QtCore.Qt.FindChildOption.FindDirectChildrenOnly)
             if direct_children:
                 self.content_container = direct_children[0]
-        self.preset_ribbon = ExternalPresetRibbon(self.card)
+        self.preset_ribbon = PresetRibbon(self.card)
         if card_layout is not None:
             card_layout.setSpacing(0)
             card_layout.removeWidget(self.tab_widget)
@@ -559,7 +306,7 @@ class ActionDialog(QtWidgets.QDialog):
                 self.reload_everything()
             return
 
-        dialog = ExternalItemEditDialog(item, int(step.get("click_count", 1) or 1), self)
+        dialog = ItemEditDialog(item, int(step.get("click_count", 1) or 1), self)
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         name, clicks, rect = dialog.get_values()
@@ -616,7 +363,7 @@ class ActionDialog(QtWidgets.QDialog):
 
     def btn_program(self):
         settings = self.macro_data.setdefault("settings", {})
-        dialog = ExternalMacroSettingsDialog(settings, self)
+        dialog = MacroSettingsDialog(settings, self)
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         repeat_count, repeat_delay = dialog.values()

@@ -97,20 +97,3 @@ cmd /c .venv\Scripts\pyinstaller.exe --noconfirm --clean DeepOrder.spec
 아래 흐름은 회귀 테스트를 완료했습니다.
 
 - `설정 -> 생성 -> 상세 편집 -> 트리거 설정 -> RUN`
-
-현재 [`dist/DeepOrder`](C:/Users/Admin/Documents/deeporder/dist/DeepOrder) 폴더가 최신 정상 배포본 기준입니다.
-
-## 운영 시 참고 사항
-
-- [`old`](C:/Users/Admin/Documents/deeporder/old)는 현재 실행 경로가 아니라, 과거 파일과 이전 산출물을 보관하는 아카이브입니다.
-- 매크로 데이터가 바뀌었다고 해서 매번 재빌드할 필요는 없습니다. 현재 구조에서는 사용자 데이터가 배포 폴더 외부 경로를 기준으로 유지됩니다.
-- 배포 문제를 점검할 때는 아래를 우선 확인하면 됩니다.
-  - PyInstaller 빌드 로그 및 경고
-  - [`DeepOrder.spec`](C:/Users/Admin/Documents/deeporder/DeepOrder.spec)의 리소스 포함 설정
-  - 배포 폴더 안의 `utils/data.json`, `img` 존재 여부
-
-## 관련 문서
-
-- [`research.md`](C:/Users/Admin/Documents/deeporder/research.md): 현재 시스템 상세 분석 문서
-- [`plan.md`](C:/Users/Admin/Documents/deeporder/plan.md): 최적화 및 유지보수 계획 문서
-- [`portfolio.md`](C:/Users/Admin/Documents/deeporder/portfolio.md): 구현 및 배포 과정 기록

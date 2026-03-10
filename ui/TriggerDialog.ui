@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TriggerDialog</class>
+ <widget class="QDialog" name="TriggerDialog">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>760</width><height>760</height></rect></property>
+  <property name="windowTitle"><string>트리거 설정</string></property>
+  <property name="styleSheet"><string notr="true">QDialog { background: #f3f4f6; }
+QFrame#DialogCard { background: white; border: 1px solid #d1d5db; border-radius: 14px; }
+QFrame#TriggerCard { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; }
+QPushButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+  font: 9pt 'Malgun Gothic';
+}
+QPushButton#PrimaryButton { background: #0ea5e9; border-color: #0284c7; color: white; font-weight: 700; }
+QLabel, QCheckBox, QComboBox, QLineEdit { color: #111827; font: 9pt 'Malgun Gothic'; }
+QComboBox, QLineEdit {
+  min-height: 36px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  padding-left: 10px;
+}
+QLabel#label_title { font: 700 12pt 'Malgun Gothic'; }
+QLabel#label_subtitle { color: #4b5563; font: 9pt 'Malgun Gothic'; }
+</string></property>
+  <layout class="QVBoxLayout" name="root_layout">
+   <property name="leftMargin"><number>16</number></property>
+   <property name="topMargin"><number>16</number></property>
+   <property name="rightMargin"><number>16</number></property>
+   <property name="bottomMargin"><number>16</number></property>
+   <item>
+    <widget class="QFrame" name="DialogCard">
+     <layout class="QVBoxLayout" name="card_layout">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="topMargin"><number>16</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="bottomMargin"><number>16</number></property>
+      <property name="spacing"><number>12</number></property>
+      <item><widget class="QLabel" name="label_title"><property name="text"><string>트리거 설정</string></property></widget></item>
+      <item><widget class="QLabel" name="label_subtitle"><property name="text"><string/></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+      <item>
+       <widget class="QScrollArea" name="scroll_area">
+        <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+        <property name="widgetResizable"><bool>true</bool></property>
+        <widget class="QWidget" name="scroll_host">
+         <layout class="QVBoxLayout" name="scroll_layout">
+          <property name="leftMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <property name="spacing"><number>12</number></property>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="footer_layout">
+        <item><spacer name="footer_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+        <item><widget class="QPushButton" name="button_save"><property name="objectName"><string>PrimaryButton</string></property><property name="text"><string>저장</string></property></widget></item>
+        <item><widget class="QPushButton" name="button_cancel"><property name="text"><string>취소</string></property></widget></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

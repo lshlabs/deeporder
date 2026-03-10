@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -13,9 +14,30 @@ from utils.temp_manager import TempManager
 from utils.types import AppSettingsData, MacroData
 
 
+logger = logging.getLogger(__name__)
+
+
 class DataManager:
     _instance = None
     SCHEMA_VERSION = 2
+    MAIN_SETTINGS_DEFAULTS = {
+        "resolution": None,
+        "custom": False,
+        "setup_completed": False,
+        "capture_hotkey": "F1",
+        "run_hotkey": "F11",
+        "stop_hotkey": "F12",
+        "expected_resolution": None,
+        "dpi_scale_locked": False,
+    }
+    MACRO_SETTINGS_DEFAULTS = {
+        "matcher_mode": "ocr",
+        "max_retries": 10,
+        "retry_interval_sec": 0.5,
+        "template_timeout_sec": 10.0,
+        "repeat_count": 1,
+        "repeat_delay_sec": 0.5,
+    }
 
     @classmethod
     def get_instance(cls):
@@ -25,59 +47,91 @@ class DataManager:
 
     def __init__(self):
         if DataManager._instance is not None:
-            raise Exception("DataManager는 싱글톤 클래스입니다.")
+            raise RuntimeError("DataManager는 싱글톤 클래스입니다.")
         self.data_path = managed_data_path()
         self.img_path = managed_img_path()
         self._data = self._load_data()
         DataManager._instance = self
 
-    # 기본값 / 로드 / 저장
     def _default_data(self):
         return {
             "macro_list": {},
-            "settings_main": {
-                "resolution": None,
-                "custom": False,
-                "setup_completed": False,
-                "capture_hotkey": "F1",
-                "run_hotkey": "F11",
-                "stop_hotkey": "F12",
-                "expected_resolution": None,
-                "dpi_scale_locked": False,
-            },
+            "settings_main": copy.deepcopy(self.MAIN_SETTINGS_DEFAULTS),
         }
 
     def _load_data(self):
         default_data = self._default_data()
-        try:
-            if self.data_path.exists():
-                with open(self.data_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-            else:
-                data = default_data
-            self._normalize_loaded_data(data)
-            return data
-        except Exception as e:
-            print(f"데이터 로드 중 오류: {e}")
+        if not self.data_path.exists():
             self._normalize_loaded_data(default_data)
             return default_data
+
+        try:
+            with open(self.data_path, "r", encoding="utf-8") as file:
+                loaded_data = json.load(file)
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.error("데이터 로드 실패: %s", exc)
+            self._normalize_loaded_data(default_data)
+            return default_data
+
+        self._normalize_loaded_data(loaded_data)
+        return loaded_data
 
     def _ensure_macro_defaults(self, macro: dict):
         macro.setdefault("program", None)
         macro.setdefault("capture_source_image", None)
         settings = macro.setdefault("settings", {})
-        settings.setdefault("matcher_mode", "ocr")
-        settings.setdefault("max_retries", 10)
-        settings.setdefault("retry_interval_sec", 0.5)
-        settings.setdefault("template_timeout_sec", 10.0)
-        settings.setdefault("repeat_count", 1)
-        settings.setdefault("repeat_delay_sec", 0.5)
+        for key, value in self.MACRO_SETTINGS_DEFAULTS.items():
+            settings.setdefault(key, value)
         macro.setdefault("actions", {})
         macro.setdefault("items", {})
         macro.setdefault("presets", {})
         macro.setdefault("default_preset_id", None)
         macro.setdefault("macro_trigger", None)
         macro.setdefault("schema_version", self.SCHEMA_VERSION)
+
+    def _new_macro_payload(self, macro_name: str) -> dict:
+        return {
+            "name": macro_name,
+            "program": None,
+            "capture_source_image": None,
+            "settings": copy.deepcopy(self.MACRO_SETTINGS_DEFAULTS),
+            "actions": {},
+            "items": {},
+            "presets": {"P1": {"id": "P1", "name": macro_name, "preset_trigger": None, "steps": []}},
+            "default_preset_id": "P1",
+            "macro_trigger": None,
+            "schema_version": self.SCHEMA_VERSION,
+        }
+
+    def _copy_if_file_exists(self, source_path: str | None, target_path: Path) -> str | None:
+        if not source_path or not os.path.exists(source_path):
+            return None
+        shutil.copy2(source_path, target_path)
+        return str(target_path.resolve())
+
+    def _build_item_from_region(self, region: dict, item_id: str, fallback_name: str) -> dict:
+        item_type = "text" if region.get("item_type") == "text" else "button"
+        screen_rect = self._normalize_rect(region.get("screen_rect"))
+        return {
+            "id": item_id,
+            "name": region.get("name") or fallback_name,
+            "item_type": item_type,
+            "screen_rect": screen_rect,
+            "capture_rect": self._normalize_rect(region.get("capture_rect")) or screen_rect,
+            "preview_image": None,
+            "enabled": True,
+        }
+
+    @staticmethod
+    def _new_item_step(item_id: str, order: int, click_count: int = 1) -> dict:
+        return {
+            "step_type": "item",
+            "item_id": item_id,
+            "click_count": int(click_count or 1),
+            "order": order,
+            "enabled": True,
+            "delay_sec": None,
+        }
 
     def _normalize_rect(self, rect):
         if not isinstance(rect, dict):
@@ -190,14 +244,13 @@ class DataManager:
 
     def save_data(self):
         try:
-            with open(self.data_path, "w", encoding="utf-8") as f:
-                json.dump(self._serialize_data(), f, indent=4, ensure_ascii=False)
+            with open(self.data_path, "w", encoding="utf-8") as file:
+                json.dump(self._serialize_data(), file, indent=4, ensure_ascii=False)
             return True
-        except Exception as e:
-            print(f"데이터 저장 중 오류: {e}")
+        except OSError as exc:
+            logger.error("데이터 저장 실패: %s", exc)
             return False
 
-    # 내부 ID 생성
     def _next_macro_key(self):
         index = 1
         while f"M{index}" in self._data["macro_list"]:
@@ -216,7 +269,6 @@ class DataManager:
             index += 1
         return f"P{index}"
 
-    # 공용 조회 / 설정 메서드
     def get_macro(self, macro_key: str):
         macro = self._data["macro_list"].get(macro_key)
         if macro:
@@ -288,7 +340,6 @@ class DataManager:
         preset["steps"] = self._sort_steps(macro, preset.get("steps", []))
         return preset["steps"]
 
-    # 검증 메서드
     def validate_macro_configuration(self, macro_key: str):
         macro = self.get_macro(macro_key)
         if not macro:
@@ -329,65 +380,26 @@ class DataManager:
                 return candidate
             index += 1
 
-    # 매크로 생성 / 복제 / 편집 메서드
     def create_macro_from_capture(self, macro_name: str, capture_regions: list[dict], source_image_path: str | None = None):
         safe_name = self._ensure_unique_macro_name(macro_name.strip() or "새 매크로")
         macro_key = self._next_macro_key()
-        self._data["macro_list"][macro_key] = {
-            "name": safe_name,
-            "program": None,
-            "capture_source_image": None,
-            "settings": {
-                "matcher_mode": "ocr",
-                "max_retries": 10,
-                "retry_interval_sec": 0.5,
-                "template_timeout_sec": 10.0,
-                "repeat_count": 1,
-                "repeat_delay_sec": 0.5,
-            },
-            "actions": {},
-            "items": {},
-            "presets": {},
-            "default_preset_id": "P1",
-            "macro_trigger": None,
-            "schema_version": self.SCHEMA_VERSION,
-        }
+        self._data["macro_list"][macro_key] = self._new_macro_payload(safe_name)
         macro = self._data["macro_list"][macro_key]
-        macro["presets"]["P1"] = {"id": "P1", "name": safe_name, "preset_trigger": None, "steps": []}
         macro_folder = self._make_macro_folder(macro_key)
-        if source_image_path and os.path.exists(source_image_path):
-            source_target = macro_folder / "capture_source.png"
-            shutil.copy2(source_image_path, source_target)
-            macro["capture_source_image"] = str(source_target.resolve())
+        macro["capture_source_image"] = self._copy_if_file_exists(source_image_path, macro_folder / "capture_source.png")
 
         for region in capture_regions:
             item_id = self._next_item_id(macro)
-            item_type = "text" if region.get("item_type") == "text" else "button"
-            item_name = region.get("name") or f"{'텍스트' if item_type == 'text' else '버튼'} {len(macro['items']) + 1}"
-            item = {
-                "id": item_id,
-                "name": item_name,
-                "item_type": item_type,
-                "screen_rect": self._normalize_rect(region.get("screen_rect")),
-                "capture_rect": self._normalize_rect(region.get("capture_rect")) or self._normalize_rect(region.get("screen_rect")),
-                "preview_image": None,
-                "enabled": True,
-            }
-            preview = region.get("preview_image")
-            if preview and os.path.exists(preview):
-                target_path = macro_folder / f"{item_id}.png"
-                shutil.copy2(preview, target_path)
-                item["preview_image"] = str(target_path.resolve())
+            fallback_name = f"{'텍스트' if region.get('item_type') == 'text' else '버튼'} {len(macro['items']) + 1}"
+            item = self._build_item_from_region(region, item_id, fallback_name)
+            item["preview_image"] = self._copy_if_file_exists(region.get("preview_image"), macro_folder / f"{item_id}.png")
             macro["items"][item_id] = item
             macro["presets"]["P1"]["steps"].append(
-                {
-                    "step_type": "item",
-                    "item_id": item_id,
-                    "click_count": int(region.get("click_count", 1) or 1),
-                    "order": len(macro["presets"]["P1"]["steps"]) + 1,
-                    "enabled": True,
-                    "delay_sec": None,
-                }
+                self._new_item_step(
+                    item_id=item_id,
+                    order=len(macro["presets"]["P1"]["steps"]) + 1,
+                    click_count=int(region.get("click_count", 1) or 1),
+                )
             )
 
         self.sort_preset_steps(macro_key, "P1")
@@ -403,31 +415,10 @@ class DataManager:
         macro_folder = self._make_macro_folder(macro_key)
         for region in capture_regions:
             item_id = self._next_item_id(macro)
-            item = {
-                "id": item_id,
-                "name": region.get("name") or f"항목 {len(macro['items']) + 1}",
-                "item_type": "text" if region.get("item_type") == "text" else "button",
-                "screen_rect": self._normalize_rect(region.get("screen_rect")),
-                "capture_rect": self._normalize_rect(region.get("capture_rect")) or self._normalize_rect(region.get("screen_rect")),
-                "preview_image": None,
-                "enabled": True,
-            }
-            preview = region.get("preview_image")
-            if preview and os.path.exists(preview):
-                target_path = macro_folder / f"{item_id}.png"
-                shutil.copy2(preview, target_path)
-                item["preview_image"] = str(target_path.resolve())
+            item = self._build_item_from_region(region, item_id, f"항목 {len(macro['items']) + 1}")
+            item["preview_image"] = self._copy_if_file_exists(region.get("preview_image"), macro_folder / f"{item_id}.png")
             macro["items"][item_id] = item
-            preset["steps"].append(
-                {
-                    "step_type": "item",
-                    "item_id": item_id,
-                    "click_count": 1,
-                    "order": len(preset["steps"]) + 1,
-                    "enabled": True,
-                    "delay_sec": None,
-                }
-            )
+            preset["steps"].append(self._new_item_step(item_id=item_id, order=len(preset["steps"]) + 1))
 
         self.sort_preset_steps(macro_key, preset["id"])
         return self.save_data()
@@ -585,11 +576,10 @@ class DataManager:
                 return None
             height, width = img.shape[:2]
             return [0, 0, width, height]
-        except Exception as e:
-            print(f"원본 이미지 좌표 계산 실패: {e}")
+        except (ImportError, OSError, RuntimeError, ValueError) as exc:
+            logger.error("원본 이미지 좌표 계산 실패: %s", exc)
             return None
 
-    # 레거시 호환 메서드
     def _wizard_actions_common(self, macro_key, mapping, starting_action_number):
         temp_manager = TempManager.get_instance()
         macro_folder = self._make_macro_folder(macro_key)
@@ -687,8 +677,8 @@ class DataManager:
             self._data["macro_list"][new_macro_key] = new_macro
             self.save_data()
             return new_macro_key
-        except Exception as e:
-            print(f"매크로 복제 중 오류: {e}")
+        except (OSError, shutil.Error, KeyError, ValueError) as exc:
+            logger.error("매크로 복제 실패: %s", exc)
             return None
 
     def _infer_item_type_from_name(self, name: str):

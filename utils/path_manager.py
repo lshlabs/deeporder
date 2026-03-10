@@ -6,19 +6,16 @@ from pathlib import Path
 
 
 def is_frozen() -> bool:
-    # PyInstaller로 실행하면 sys.frozen 값이 들어갑니다.
     return bool(getattr(sys, "frozen", False))
 
 
 def get_resource_dir() -> Path:
-    # UI 같은 정적 리소스는 번들 내부 경로를 봐야 합니다.
     if is_frozen():
         return Path(getattr(sys, "_MEIPASS"))
     return Path(__file__).resolve().parent.parent
 
 
 def get_runtime_dir() -> Path:
-    # 저장 데이터는 실행 파일 옆 경로를 기준으로 씁니다.
     if is_frozen():
         return Path(sys.executable).resolve().parent
     return Path(__file__).resolve().parent.parent
@@ -79,7 +76,7 @@ def make_relative_to_base(path: str | Path) -> str:
     for base_dir in (runtime_base, resource_base):
         try:
             return str(current_path.resolve().relative_to(base_dir.resolve()))
-        except Exception:
+        except ValueError:
             continue
 
     return str(current_path)

@@ -61,3 +61,12 @@ resources/img/
 plan.md
 portfolio.md
 research.md
+
+docs/
+refactoring_notes.md
+refactoring_plan.md
+example/
+example_code/
+experiments/
+tests/
+test_results/

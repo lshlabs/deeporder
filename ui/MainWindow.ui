@@ -28,8 +28,16 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow{
+   <string notr="true">QMainWindow {
 	background-color: #EFEFEF;
+}
+QWidget {
+	font-family: 'Malgun Gothic';
+	font-size: 9pt;
+}
+QLabel#label_title, QLabel#label_run, QLabel#label_stop {
+	font-size: 20pt;
+	font-weight: 700;
 }</string>
   </property>
   <widget class="QWidget" name="mainwindow">

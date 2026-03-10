@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MacroSettingsDialog</class>
+ <widget class="QDialog" name="MacroSettingsDialog">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>320</width><height>180</height></rect>
+  </property>
+  <property name="windowTitle"><string>매크로 설정</string></property>
+  <property name="modal"><bool>true</bool></property>
+  <layout class="QVBoxLayout" name="root_layout">
+   <property name="leftMargin"><number>16</number></property>
+   <property name="topMargin"><number>16</number></property>
+   <property name="rightMargin"><number>16</number></property>
+   <property name="bottomMargin"><number>16</number></property>
+   <property name="spacing"><number>12</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="repeat_row">
+     <item><widget class="QLabel" name="label_repeat"><property name="text"><string>실행 횟수</string></property><property name="minimumSize"><size><width>80</width><height>0</height></size></property></widget></item>
+     <item><widget class="QSpinBox" name="spin_repeat"><property name="minimum"><number>0</number></property><property name="maximum"><number>9999</number></property></widget></item>
+     <item><widget class="QLabel" name="label_repeat_hint"><property name="text"><string>0 = 무한 반복</string></property><property name="styleSheet"><string notr="true">color:#4b5563;</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="delay_row">
+     <item><widget class="QLabel" name="label_delay"><property name="text"><string>반복 딜레이</string></property><property name="minimumSize"><size><width>80</width><height>0</height></size></property></widget></item>
+     <item><widget class="QDoubleSpinBox" name="spin_delay"><property name="decimals"><number>1</number></property><property name="minimum"><double>0.000000000000000</double></property><property name="maximum"><double>9999.000000000000000</double></property><property name="singleStep"><double>0.100000000000000</double></property></widget></item>
+     <item><widget class="QLabel" name="label_delay_suffix"><property name="text"><string>초</string></property></widget></item>
+     <item><spacer name="delay_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="footer_row">
+     <item><spacer name="footer_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+     <item><widget class="QPushButton" name="button_save"><property name="text"><string>저장</string></property></widget></item>
+     <item><widget class="QPushButton" name="button_cancel"><property name="text"><string>취소</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

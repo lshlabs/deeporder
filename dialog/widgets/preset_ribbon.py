@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets, uic
+
+from utils.path_manager import ui_path
 
 
 class PresetTabLabel(QtWidgets.QPushButton):
@@ -19,65 +21,10 @@ class PresetRibbon(QtWidgets.QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("preset_ribbon")
+        uic.loadUi(str(ui_path("PresetRibbon.ui")), self)
         self._chip_height = 28
         self.setFixedHeight(self._chip_height)
-        self.setStyleSheet(
-            "QFrame#preset_ribbon { background: transparent; border: none; }"
-            "QFrame#preset_chip {"
-            "  background: #e4e4e4;"
-            "  border: 1px solid #8e8e8e;"
-            "  border-bottom: none;"
-            "  border-top-left-radius: 7px;"
-            "  border-top-right-radius: 7px;"
-            "  border-bottom-left-radius: 0px;"
-            "  border-bottom-right-radius: 0px;"
-            "}"
-            "QFrame#preset_chip:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }"
-            "QFrame#preset_chip[selected='true'] {"
-            "  background: #ffffff;"
-            "  border-color: #2f2f2f;"
-            "  border-bottom: none;"
-            "}"
-            "QPushButton#preset_label {"
-            "  border: none;"
-            "  background: transparent;"
-            "  color: #111827;"
-            "  padding: 0 10px;"
-            "  min-height: 22px;"
-            "}"
-            "QPushButton#preset_label:hover { color: #0f172a; }"
-            "QPushButton#preset_close {"
-            "  min-width: 13px; max-width: 13px;"
-            "  min-height: 13px; max-height: 13px;"
-            "  padding: 0px;"
-            "  border-radius: 6px;"
-            "  border: none;"
-            "  background: transparent;"
-            "  color: #6b7280;"
-            "}"
-            "QPushButton#preset_close:hover { background: #d7dce3; color: #111827; }"
-            "QPushButton#preset_add {"
-            "  min-width: 28px; max-width: 28px;"
-            "  min-height: 28px; max-height: 28px;"
-            "  padding: 0px;"
-            "  margin: 0px;"
-            "  border-top-left-radius: 7px;"
-            "  border-top-right-radius: 7px;"
-            "  border-bottom-left-radius: 0px;"
-            "  border-bottom-right-radius: 0px;"
-            "  border: 1px solid #8e8e8e;"
-            "  border-bottom: none;"
-            "  background: #e4e4e4;"
-            "  color: #111827;"
-            "}"
-            "QPushButton#preset_add:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }"
-        )
-        layout = QtWidgets.QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(3)
-        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignBottom)
-        self._layout = layout
+        self._layout = self.layout()
 
     def _clear(self):
         while self._layout.count():

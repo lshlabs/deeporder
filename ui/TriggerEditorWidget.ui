@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TriggerEditorWidget</class>
+ <widget class="QFrame" name="TriggerEditorWidget">
+  <property name="styleSheet"><string notr="true">QLabel#label_title { font: 700 10pt 'Malgun Gothic'; color: #111827; }
+QLabel#guide_label { color: #4b5563; font: 8.5pt 'Malgun Gothic'; padding-left: 2px; }
+QLabel#region_label { color: #4b5563; background: white; border: 1px solid #d1d5db; border-radius: 10px; padding: 0 10px; }
+QLabel#color_chip { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; border-radius: 8px; }
+</string></property>
+  <layout class="QVBoxLayout" name="root_layout">
+   <property name="leftMargin"><number>16</number></property>
+   <property name="topMargin"><number>16</number></property>
+   <property name="rightMargin"><number>16</number></property>
+   <property name="bottomMargin"><number>16</number></property>
+   <property name="spacing"><number>10</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="header_row">
+     <property name="spacing"><number>10</number></property>
+     <item><widget class="QLabel" name="label_title"><property name="text"><string>트리거</string></property></widget></item>
+     <item><widget class="QCheckBox" name="check_enabled"><property name="text"><string>활성화</string></property></widget></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QWidget" name="row_type">
+     <layout class="QHBoxLayout" name="type_row">
+      <property name="spacing"><number>10</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item><widget class="QLabel" name="label_type"><property name="minimumSize"><size><width>46</width><height>0</height></size></property><property name="text"><string>타입</string></property></widget></item>
+      <item><widget class="QComboBox" name="combo_type"/></item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="row_text_item">
+     <layout class="QHBoxLayout" name="text_item_row">
+      <property name="spacing"><number>10</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item><widget class="QLabel" name="label_text_item"><property name="minimumSize"><size><width>46</width><height>0</height></size></property><property name="text"><string>요소</string></property></widget></item>
+      <item><widget class="QComboBox" name="combo_text_item"/></item>
+     </layout>
+    </widget>
+   </item>
+   <item><widget class="QLabel" name="guide_label"><property name="text"><string/></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+   <item>
+    <widget class="QWidget" name="row_region">
+     <layout class="QHBoxLayout" name="region_row">
+      <property name="spacing"><number>10</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item><widget class="QPushButton" name="button_region"><property name="text"><string>영역 지정</string></property></widget></item>
+      <item><widget class="QLabel" name="region_label"><property name="text"><string>선택된 영역 없음</string></property><property name="minimumSize"><size><width>0</width><height>36</height></size></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="row_color">
+     <layout class="QHBoxLayout" name="color_row">
+      <property name="spacing"><number>10</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item><widget class="QPushButton" name="button_color"><property name="text"><string>색상 고르기</string></property></widget></item>
+      <item><widget class="QLabel" name="color_chip"><property name="text"><string>미선택</string></property><property name="minimumSize"><size><width>92</width><height>32</height></size></property><property name="maximumSize"><size><width>92</width><height>32</height></size></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+      <item><widget class="QPushButton" name="button_sample"><property name="text"><string>중앙색 추출</string></property></widget></item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="row_text">
+     <layout class="QHBoxLayout" name="text_row">
+      <property name="spacing"><number>10</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item><widget class="QLabel" name="label_text"><property name="minimumSize"><size><width>46</width><height>0</height></size></property><property name="text"><string>텍스트</string></property></widget></item>
+      <item><widget class="QLineEdit" name="line_text"><property name="placeholderText"><string>예: 15분</string></property></widget></item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

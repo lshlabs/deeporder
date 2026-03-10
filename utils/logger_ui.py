@@ -20,10 +20,10 @@ class GUILogHandler(logging.Handler):
         self.signals = _LogSignal()
         self.signals.update_log.connect(self._append_line)
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         try:
             self.signals.update_log.emit(self.format(record))
-        except Exception:
+        except RuntimeError:
             self.handleError(record)
 
     def _append_line(self, line: str):
@@ -35,7 +35,7 @@ class GUILogHandler(logging.Handler):
 
 
 class CategoryFormatter(logging.Formatter):
-    def format(self, record):
+    def format(self, record) -> str:
         message = record.getMessage()
         category = record.levelname
         if message.startswith("[") and "]" in message:
@@ -52,6 +52,7 @@ class CategoryFormatter(logging.Formatter):
 def bind_text_widget(widget, logger_name: str = "deeporder.ui", max_lines: int = 500) -> GUILogHandler:
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
+    logger.handlers = [existing for existing in logger.handlers if not isinstance(existing, GUILogHandler)]
     handler = GUILogHandler(widget, max_lines=max_lines)
     handler.setFormatter(CategoryFormatter("%(message)s", "%H:%M:%S"))
     logger.addHandler(handler)

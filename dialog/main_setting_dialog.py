@@ -96,10 +96,6 @@ class MainSettingDialog(QtWidgets.QDialog):
     def _apply_styles(self):
         for hotkey_edit in (self.lineEdit_hotkey, self.lineEdit_run_hotkey, self.lineEdit_stop_hotkey):
             hotkey_edit.setMinimumHeight(30)
-            hotkey_edit.setStyleSheet(
-                "color:black; border-radius: 5px; padding-left:3px; background:white;"
-            )
-        self.label_status.setStyleSheet("border:none; color:black;")
 
     def _build_layout(self):
         self.frame_main.setGeometry(10, 10, 360, 380)
@@ -155,7 +151,6 @@ class MainSettingDialog(QtWidgets.QDialog):
         row.setSpacing(10)
         label = QtWidgets.QLabel(label_text, self.frame_main)
         label.setFixedWidth(70)
-        label.setStyleSheet("border:none; color:black;")
         row.addWidget(label)
         row.addWidget(editor, 1)
         return row

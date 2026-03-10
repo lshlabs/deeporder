@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from PIL import Image, ImageGrab
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, uic
 
 from dialog.region_capture_dialog import RegionCaptureDialog
+from utils.path_manager import ui_path
 
 
 class NoWheelComboBox(QtWidgets.QComboBox):
@@ -29,87 +30,36 @@ class TriggerEditorWidget(QtWidgets.QFrame):
         self.text_items = text_items or []
         self.trigger_rect = None
         self.trigger_color = None
+        uic.loadUi(str(ui_path("TriggerEditorWidget.ui")), self)
         self.setObjectName("TriggerCard")
 
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(16, 16, 16, 16)
-        layout.setSpacing(10)
+        self.label_title = self.findChild(QtWidgets.QLabel, "label_title")
+        self.check_enabled = self.findChild(QtWidgets.QCheckBox, "check_enabled")
+        self.combo_type = self._replace_combo_with_no_wheel("combo_type")
+        self.combo_text_item = self._replace_combo_with_no_wheel("combo_text_item")
+        self.guide_label = self.findChild(QtWidgets.QLabel, "guide_label")
+        self.button_region = self.findChild(QtWidgets.QPushButton, "button_region")
+        self.region_label = self.findChild(QtWidgets.QLabel, "region_label")
+        self.button_color = self.findChild(QtWidgets.QPushButton, "button_color")
+        self.color_chip = self.findChild(QtWidgets.QLabel, "color_chip")
+        self.button_sample = self.findChild(QtWidgets.QPushButton, "button_sample")
+        self.line_text = self.findChild(QtWidgets.QLineEdit, "line_text")
 
-        header_row = QtWidgets.QHBoxLayout()
-        header_row.setSpacing(10)
-        title_label = QtWidgets.QLabel(title)
-        title_label.setStyleSheet("QLabel { font: 700 10pt 'Malgun Gothic'; color: #111827; }")
-        header_row.addWidget(title_label, 1)
-        self.check_enabled = QtWidgets.QCheckBox("활성화")
-        header_row.addWidget(self.check_enabled, 0, QtCore.Qt.AlignmentFlag.AlignRight)
-        layout.addLayout(header_row)
+        self.row_text_item = self.findChild(QtWidgets.QWidget, "row_text_item")
+        self.row_region = self.findChild(QtWidgets.QWidget, "row_region")
+        self.row_color = self.findChild(QtWidgets.QWidget, "row_color")
+        self.row_text = self.findChild(QtWidgets.QWidget, "row_text")
 
-        type_row = QtWidgets.QHBoxLayout()
-        type_row.setSpacing(10)
-        type_label = QtWidgets.QLabel("타입")
-        type_label.setFixedWidth(46)
-        self.combo_type = NoWheelComboBox()
+        self.label_title.setText(title)
+        self.combo_type.clear()
         self.combo_type.addItem("사용 안 함", None)
         self.combo_type.addItem("픽셀 색상", "pixel_color")
         self.combo_type.addItem("텍스트 감지", "text_roi")
-        type_row.addWidget(type_label)
-        type_row.addWidget(self.combo_type, 1)
-        layout.addLayout(type_row)
 
-        self.text_item_row = QtWidgets.QHBoxLayout()
-        self.text_item_row.setSpacing(10)
-        self.text_item_label = QtWidgets.QLabel("요소")
-        self.text_item_label.setFixedWidth(46)
-        self.combo_text_item = NoWheelComboBox()
+        self.combo_text_item.clear()
         self.combo_text_item.addItem("직접 선택")
         for item in self.text_items:
             self.combo_text_item.addItem(item.get("name", item.get("id", "텍스트 요소")), item)
-        self.text_item_row.addWidget(self.text_item_label)
-        self.text_item_row.addWidget(self.combo_text_item, 1)
-        layout.addLayout(self.text_item_row)
-
-        self.guide_label = QtWidgets.QLabel("")
-        self.guide_label.setWordWrap(True)
-        self.guide_label.setStyleSheet("QLabel { color: #4b5563; font: 8.5pt 'Malgun Gothic'; padding-left: 2px; }")
-        layout.addWidget(self.guide_label)
-
-        self.region_row = QtWidgets.QHBoxLayout()
-        self.region_row.setSpacing(10)
-        self.button_region = QtWidgets.QPushButton("영역 지정")
-        self.region_label = QtWidgets.QLabel("선택된 영역 없음")
-        self.region_label.setWordWrap(True)
-        self.region_label.setMinimumHeight(36)
-        self.region_label.setStyleSheet(
-            "QLabel { color: #4b5563; background: white; border: 1px solid #d1d5db; border-radius: 10px; padding: 0 10px; }"
-        )
-        self.region_row.addWidget(self.button_region)
-        self.region_row.addWidget(self.region_label, 1)
-        layout.addLayout(self.region_row)
-
-        self.color_row = QtWidgets.QHBoxLayout()
-        self.color_row.setSpacing(10)
-        self.button_color = QtWidgets.QPushButton("색상 고르기")
-        self.color_chip = QtWidgets.QLabel("미선택")
-        self.color_chip.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.color_chip.setFixedSize(92, 32)
-        self.color_chip.setStyleSheet(
-            "QLabel { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; border-radius: 8px; }"
-        )
-        self.button_sample = QtWidgets.QPushButton("중앙색 추출")
-        self.color_row.addWidget(self.button_color)
-        self.color_row.addWidget(self.color_chip)
-        self.color_row.addWidget(self.button_sample)
-        layout.addLayout(self.color_row)
-
-        self.text_row = QtWidgets.QHBoxLayout()
-        self.text_row.setSpacing(10)
-        text_label = QtWidgets.QLabel("텍스트")
-        text_label.setFixedWidth(46)
-        self.line_text = QtWidgets.QLineEdit()
-        self.line_text.setPlaceholderText("예: 15분")
-        self.text_row.addWidget(text_label)
-        self.text_row.addWidget(self.line_text, 1)
-        layout.addLayout(self.text_row)
 
         self.combo_type.currentTextChanged.connect(self._sync_visible_fields)
         self.combo_text_item.currentIndexChanged.connect(self.apply_text_item_selection)
@@ -119,6 +69,29 @@ class TriggerEditorWidget(QtWidgets.QFrame):
 
         self.load_trigger(trigger)
         self._sync_visible_fields()
+
+    def _replace_combo_with_no_wheel(self, object_name: str) -> NoWheelComboBox:
+        original_combo = self.findChild(QtWidgets.QComboBox, object_name)
+        if original_combo is None:
+            raise RuntimeError(f"{object_name} 콤보박스를 찾을 수 없습니다.")
+
+        parent_widget = original_combo.parentWidget()
+        layout = parent_widget.layout() if parent_widget is not None else None
+        if layout is None:
+            raise RuntimeError(f"{object_name}의 부모 레이아웃을 찾을 수 없습니다.")
+
+        index = layout.indexOf(original_combo)
+        replacement = NoWheelComboBox(parent_widget)
+        replacement.setObjectName(object_name)
+        replacement.setMinimumSize(original_combo.minimumSize())
+        replacement.setMaximumSize(original_combo.maximumSize())
+        replacement.setSizePolicy(original_combo.sizePolicy())
+        replacement.setEnabled(original_combo.isEnabled())
+
+        layout.removeWidget(original_combo)
+        original_combo.deleteLater()
+        layout.insertWidget(index, replacement, 1)
+        return replacement
 
     def load_trigger(self, trigger: dict | None):
         if not trigger:
@@ -151,21 +124,18 @@ class TriggerEditorWidget(QtWidgets.QFrame):
 
         self.button_region.setEnabled(active)
         self.region_label.setEnabled(active)
-        self._set_row_visible(self.region_row, active and (not text_enabled or not has_text_items or not using_existing_text_item))
-        self._set_row_visible(self.color_row, color_enabled)
-        self._set_row_visible(self.text_row, text_enabled and (not has_text_items or not using_existing_text_item))
-        self._set_row_visible(self.text_item_row, text_enabled and has_text_items)
+        self._set_row_visible(self.row_region, active and (not text_enabled or not has_text_items or not using_existing_text_item))
+        self._set_row_visible(self.row_color, color_enabled)
+        self._set_row_visible(self.row_text, text_enabled and (not has_text_items or not using_existing_text_item))
+        self._set_row_visible(self.row_text_item, text_enabled and has_text_items)
         self._sync_guide_label(trigger_type)
 
         if text_enabled and self.text_items and self.combo_text_item.currentIndex() == 0 and not self.trigger_rect:
             self.combo_text_item.setCurrentIndex(1)
 
-    def _set_row_visible(self, row_layout: QtWidgets.QLayout, visible: bool):
-        for index in range(row_layout.count()):
-            item = row_layout.itemAt(index)
-            widget = item.widget()
-            if widget is not None:
-                widget.setVisible(visible)
+    @staticmethod
+    def _set_row_visible(row_widget: QtWidgets.QWidget, visible: bool):
+        row_widget.setVisible(visible)
 
     def _sync_guide_label(self, trigger_type):
         if trigger_type == "text_roi":
@@ -223,7 +193,7 @@ class TriggerEditorWidget(QtWidgets.QFrame):
     def select_region(self):
         try:
             screenshot_path = self._get_capture_source_path()
-        except Exception as e:
+        except (OSError, ValueError) as e:
             QtWidgets.QMessageBox.warning(self, "캡처 오류", f"화면 캡처에 실패했습니다.\n{e}")
             return
 
@@ -287,7 +257,7 @@ class TriggerEditorWidget(QtWidgets.QFrame):
         try:
             screenshot_path = self._get_capture_source_path()
             self._sample_center_color_from_path(screenshot_path, self.trigger_rect)
-        except Exception as e:
+        except (OSError, ValueError) as e:
             QtWidgets.QMessageBox.warning(self, "캡처 오류", f"색상 추출에 실패했습니다.\n{e}")
 
     def to_trigger(self):
@@ -332,78 +302,40 @@ class TriggerDialog(QtWidgets.QDialog):
         self._build_ui()
 
     def _build_ui(self):
-        self.setStyleSheet(
-            "QDialog { background: #f3f4f6; }"
-            "QFrame#DialogCard { background: white; border: 1px solid #d1d5db; border-radius: 14px; }"
-            "QFrame#TriggerCard { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; }"
-            "QPushButton {"
-            "  min-height: 38px;"
-            "  padding: 0 14px;"
-            "  border-radius: 10px;"
-            "  border: 1px solid #d1d5db;"
-            "  background: white;"
-            "  color: #111827;"
-            "  font: 9pt 'Malgun Gothic';"
-            "}"
-            "QPushButton#PrimaryButton { background: #0ea5e9; border-color: #0284c7; color: white; font-weight: 700; }"
-            "QLabel, QCheckBox, QComboBox, QLineEdit { color: #111827; font: 9pt 'Malgun Gothic'; }"
-            "QComboBox, QLineEdit {"
-            "  min-height: 36px;"
-            "  border-radius: 10px;"
-            "  border: 1px solid #d1d5db;"
-            "  background: white;"
-            "  padding-left: 10px;"
-            "}"
+        uic.loadUi(str(ui_path("TriggerDialog.ui")), self)
+        self.label_subtitle = self.findChild(QtWidgets.QLabel, "label_subtitle")
+        self.scroll_area = self.findChild(QtWidgets.QScrollArea, "scroll_area")
+        self.scroll_host = self.findChild(QtWidgets.QWidget, "scroll_host")
+        self.button_save = self.findChild(QtWidgets.QPushButton, "button_save")
+        self.button_cancel = self.findChild(QtWidgets.QPushButton, "button_cancel")
+
+        self.scroll_layout = self.scroll_host.layout()
+        subtitle_text = (
+            "매크로 생성 때 저장한 화면을 기준으로 영역과 색상을 선택해 트리거를 설정합니다."
+            if self.macro.get("capture_source_image")
+            else "저장된 캡처 화면이 없으면 현재 화면을 기준으로 영역과 색상을 선택합니다."
         )
+        self.label_subtitle.setText(subtitle_text)
+        self._build_editors()
+        self.button_save.clicked.connect(self._save)
+        self.button_cancel.clicked.connect(self.reject)
 
-        root = QtWidgets.QVBoxLayout(self)
-        root.setContentsMargins(16, 16, 16, 16)
-
-        card = QtWidgets.QFrame(self)
-        card.setObjectName("DialogCard")
-        root.addWidget(card)
-
-        card_layout = QtWidgets.QVBoxLayout(card)
-        card_layout.setContentsMargins(16, 16, 16, 16)
-        card_layout.setSpacing(12)
-
-        title = QtWidgets.QLabel("트리거 설정")
-        title.setStyleSheet("QLabel { font: 700 12pt 'Malgun Gothic'; }")
-        card_layout.addWidget(title)
-
-        if self.macro.get("capture_source_image"):
-            subtitle_text = "매크로 생성 때 저장한 화면을 기준으로 영역과 색상을 선택해 트리거를 설정합니다."
-        else:
-            subtitle_text = "저장된 캡처 화면이 없으면 현재 화면을 기준으로 영역과 색상을 선택합니다."
-        subtitle = QtWidgets.QLabel(subtitle_text)
-        subtitle.setStyleSheet("QLabel { color: #4b5563; font: 9pt 'Malgun Gothic'; }")
-        card_layout.addWidget(subtitle)
-
-        scroll = QtWidgets.QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
-        card_layout.addWidget(scroll, 1)
-
-        scroll_host = QtWidgets.QWidget()
-        scroll.setWidget(scroll_host)
-        scroll_layout = QtWidgets.QVBoxLayout(scroll_host)
-        scroll_layout.setContentsMargins(0, 0, 0, 0)
-        scroll_layout.setSpacing(12)
+    def _build_editors(self) -> None:
+        while self.scroll_layout.count():
+            item = self.scroll_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
 
         shared_screenshot = self.macro.get("capture_source_image")
-
-        text_items = [
-            item
-            for item in self.macro.get("items", {}).values()
-            if isinstance(item, dict) and item.get("item_type") == "text"
-        ]
+        text_items = self._collect_text_items()
 
         self.macro_editor = TriggerEditorWidget(
             "매크로 실행 트리거",
             self.macro.get("macro_trigger"),
             screenshot_path=shared_screenshot,
         )
-        scroll_layout.addWidget(self.macro_editor)
+        self.scroll_layout.addWidget(self.macro_editor)
 
         for preset_id, preset in self.macro.get("presets", {}).items():
             required = preset_id != self.macro.get("default_preset_id")
@@ -415,21 +347,16 @@ class TriggerDialog(QtWidgets.QDialog):
                 text_items=text_items,
             )
             self.preset_editors[preset_id] = editor
-            scroll_layout.addWidget(editor)
+            self.scroll_layout.addWidget(editor)
 
-        scroll_layout.addStretch(1)
+        self.scroll_layout.addStretch(1)
 
-        footer = QtWidgets.QHBoxLayout()
-        footer.addStretch(1)
-        self.button_save = QtWidgets.QPushButton("저장")
-        self.button_save.setObjectName("PrimaryButton")
-        self.button_cancel = QtWidgets.QPushButton("취소")
-        footer.addWidget(self.button_save)
-        footer.addWidget(self.button_cancel)
-        card_layout.addLayout(footer)
-
-        self.button_save.clicked.connect(self._save)
-        self.button_cancel.clicked.connect(self.reject)
+    def _collect_text_items(self) -> list[dict]:
+        return [
+            item
+            for item in self.macro.get("items", {}).values()
+            if isinstance(item, dict) and item.get("item_type") == "text"
+        ]
 
     def _save(self):
         try:
@@ -442,5 +369,5 @@ class TriggerDialog(QtWidgets.QDialog):
                 payload["preset_triggers"][preset_id] = trigger
             self.result_payload = payload
             self.accept()
-        except Exception as e:
+        except ValueError as e:
             QtWidgets.QMessageBox.warning(self, "입력 오류", str(e))

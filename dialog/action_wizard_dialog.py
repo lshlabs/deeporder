@@ -3,12 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from PIL import ImageGrab
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets, uic
 
 from core_functions.hotkey_monitor import HotkeyMonitor
 from dialog.action_dialog import ActionDialog
 from dialog.region_capture_dialog import RegionCaptureDialog
 from utils.data_manager import DataManager
+from utils.path_manager import ui_path
 
 
 class ActionWizardDialog(QtWidgets.QDialog):
@@ -35,78 +36,14 @@ class ActionWizardDialog(QtWidgets.QDialog):
         )
 
     def _build_ui(self):
-        self.setWindowTitle("감시모드 진입")
-        self.setFixedSize(460, 260)
-        self.setStyleSheet(
-            "QDialog { background: #f3f4f6; }"
-            "QFrame#Card { background: white; border: 1px solid #d1d5db; border-radius: 14px; }"
-            "QLabel { color: #111827; font-family: 'Malgun Gothic'; }"
-            "QPushButton {"
-            "  min-height: 36px;"
-            "  padding: 0 14px;"
-            "  border-radius: 10px;"
-            "  border: 1px solid #c7ccd4;"
-            "  background: #ffffff;"
-            "  color: #111827;"
-            "  font: 9pt 'Malgun Gothic';"
-            "}"
-            "QPushButton#PrimaryButton {"
-            "  background: #0ea5e9;"
-            "  border: 1px solid #0284c7;"
-            "  color: white;"
-            "  font-weight: 700;"
-            "}"
-            "QPushButton:disabled { background: #dbeafe; color: #6b7280; border-color: #bfdbfe; }"
-        )
+        uic.loadUi(str(ui_path("ActionWizardDialog.ui")), self)
+        self.label_title = self.findChild(QtWidgets.QLabel, "label_title")
+        self.status_label = self.findChild(QtWidgets.QLabel, "label_status")
+        self.button_start = self.findChild(QtWidgets.QPushButton, "button_start")
+        self.button_cancel = self.findChild(QtWidgets.QPushButton, "button_cancel")
 
-        root_layout = QtWidgets.QVBoxLayout(self)
-        root_layout.setContentsMargins(18, 18, 18, 18)
-
-        card = QtWidgets.QFrame(self)
-        card.setObjectName("Card")
-        root_layout.addWidget(card)
-
-        card_layout = QtWidgets.QVBoxLayout(card)
-        card_layout.setContentsMargins(22, 20, 22, 18)
-        card_layout.setSpacing(14)
-
-        chip = QtWidgets.QLabel("MONITOR MODE")
-        chip.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        chip.setFixedWidth(120)
-        chip.setStyleSheet(
-            "QLabel { background: #e0f2fe; color: #0369a1; border-radius: 10px; padding: 6px 10px; font: 700 8pt 'Malgun Gothic'; }"
-        )
-        card_layout.addWidget(chip, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
-
-        title = QtWidgets.QLabel(self.title_text)
-        title.setWordWrap(True)
-        title.setStyleSheet("QLabel { font: 700 13pt 'Malgun Gothic'; }")
-        card_layout.addWidget(title)
-
-        self.status_label = QtWidgets.QLabel(self._monitor_intro_text())
-        self.status_label.setWordWrap(True)
-        self.status_label.setStyleSheet("QLabel { font: 9pt 'Malgun Gothic'; line-height: 1.4; }")
-        card_layout.addWidget(self.status_label)
-
-        hint = QtWidgets.QLabel("이미지 업로드 없이 바로 화면을 캡처하고, 이어서 영역 선택으로 이동합니다.")
-        hint.setWordWrap(True)
-        hint.setStyleSheet("QLabel { color: #4b5563; font: 8pt 'Malgun Gothic'; }")
-        card_layout.addWidget(hint)
-
-        card_layout.addStretch(1)
-
-        action_row = QtWidgets.QHBoxLayout()
-        action_row.setSpacing(10)
-        action_row.addStretch(1)
-
-        self.button_cancel = QtWidgets.QPushButton("취소")
-        action_row.addWidget(self.button_cancel)
-
-        self.button_start = QtWidgets.QPushButton("감시모드 시작")
-        self.button_start.setObjectName("PrimaryButton")
-        action_row.addWidget(self.button_start)
-
-        card_layout.addLayout(action_row)
+        self.label_title.setText(self.title_text)
+        self.status_label.setText(self._monitor_intro_text())
 
     def _connect_signals(self):
         self.button_start.clicked.connect(self.enter_monitor_mode)
@@ -143,7 +80,7 @@ class ActionWizardDialog(QtWidgets.QDialog):
     def _capture_and_open_regions(self):
         try:
             screenshot = ImageGrab.grab(all_screens=True)
-        except Exception as error:
+        except (OSError, ValueError) as error:
             if self.parent():
                 self.parent().showNormal()
             self.showNormal()

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PresetRibbon</class>
+ <widget class="QFrame" name="preset_ribbon">
+  <property name="styleSheet"><string notr="true">QFrame#preset_ribbon { background: transparent; border: none; }
+QFrame#preset_chip {
+  background: #e4e4e4;
+  border: 1px solid #8e8e8e;
+  border-bottom: none;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+QFrame#preset_chip:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }
+QFrame#preset_chip[selected='true'] {
+  background: #ffffff;
+  border-color: #2f2f2f;
+  border-bottom: none;
+}
+QPushButton#preset_label {
+  border: none;
+  background: transparent;
+  color: #111827;
+  padding: 0 10px;
+  min-height: 22px;
+}
+QPushButton#preset_label:hover { color: #0f172a; }
+QPushButton#preset_close {
+  min-width: 13px; max-width: 13px;
+  min-height: 13px; max-height: 13px;
+  padding: 0px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+}
+QPushButton#preset_close:hover { background: #d7dce3; color: #111827; }
+QPushButton#preset_add {
+  min-width: 28px; max-width: 28px;
+  min-height: 28px; max-height: 28px;
+  padding: 0px;
+  margin: 0px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border: 1px solid #8e8e8e;
+  border-bottom: none;
+  background: #e4e4e4;
+  color: #111827;
+}
+QPushButton#preset_add:hover { background: #e9eef5; border-color: #7d8ea3; border-bottom: none; }
+</string></property>
+  <layout class="QHBoxLayout" name="ribbon_layout">
+   <property name="leftMargin"><number>0</number></property>
+   <property name="topMargin"><number>0</number></property>
+   <property name="rightMargin"><number>0</number></property>
+   <property name="bottomMargin"><number>0</number></property>
+   <property name="spacing"><number>3</number></property>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

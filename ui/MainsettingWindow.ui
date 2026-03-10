@@ -45,8 +45,18 @@
    </property>
    <property name="styleSheet">
     <string notr="true">background: white;
-border:1px solid black;
+border: 1px solid black;
 border-radius: 5px;
+QLabel {
+	border: none;
+	color: black;
+}
+QLineEdit {
+	color: black;
+	border-radius: 5px;
+	padding-left: 3px;
+	background: white;
+}
 </string>
    </property>
    <property name="frameShape">

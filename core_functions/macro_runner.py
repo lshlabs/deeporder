@@ -21,11 +21,6 @@ class MacroRunner(QObject):
         self.running_macros: dict[str, threading.Thread] = {}
         self.stop_flags: dict[str, threading.Event] = {}
         self.data_manager = DataManager.get_instance()
-        self.default_run_options = {
-            "max_retries": 10,
-            "retry_interval_sec": 0.5,
-            "template_timeout_sec": 10.0,
-        }
         self.ocr_reader = self._build_ocr_reader()
         self.trigger_evaluator = TriggerEvaluator(self.ocr_reader)
         self.macro_executor = MacroExecutor(self._emit_log)
@@ -35,7 +30,10 @@ class MacroRunner(QObject):
             import easyocr
 
             return easyocr.Reader(["ko", "en"], gpu=False, verbose=False)
-        except Exception:
+        except ImportError:
+            return None
+        except (RuntimeError, OSError) as exc:
+            self._emit_log(f"[FAIL] OCR 초기화 실패: {exc}")
             return None
 
     def _emit_log(self, message: str) -> None:
@@ -109,28 +107,33 @@ class MacroRunner(QObject):
         return HotkeyMonitor(self.data_manager.get_stop_hotkey(), "F12")
 
     def start_macro(self, macro_key: str, run_options: dict | None = None) -> bool:
+        if run_options is not None and not isinstance(run_options, dict):
+            raise TypeError("run_options는 dict 또는 None이어야 합니다.")
+
+        if macro_key in self.running_macros and self.running_macros[macro_key].is_alive():
+            self._emit_log(f"[FAIL] 이미 실행 중인 매크로입니다: {macro_key}")
+            return False
+
+        macro_data = self.data_manager.get_macro(macro_key)
+        if not macro_data:
+            self._emit_log(f"[FAIL] 매크로를 찾을 수 없습니다: {macro_key}")
+            return False
+
+        stop_event = threading.Event()
+        worker = threading.Thread(target=self._run_macro, args=(macro_key, stop_event), daemon=True)
+
+        self.stop_flags[macro_key] = stop_event
+        self.running_macros[macro_key] = worker
         try:
-            if macro_key in self.running_macros and self.running_macros[macro_key].is_alive():
-                self._emit_log(f"[FAIL] 이미 실행 중인 매크로입니다: {macro_key}")
-                return False
-
-            macro_data = self.data_manager.get_macro(macro_key)
-            if not macro_data:
-                self._emit_log(f"[FAIL] 매크로를 찾을 수 없습니다: {macro_key}")
-                return False
-
-            stop_event = threading.Event()
-            self.stop_flags[macro_key] = stop_event
-            worker = threading.Thread(target=self._run_macro, args=(macro_key, stop_event), daemon=True)
             worker.start()
-            self.running_macros[macro_key] = worker
-            self.status_changed.emit(macro_key, "running")
-            return True
-        except Exception as exc:
-            self._emit_log(f"[FAIL] 매크로 시작 실패: {exc}")
+        except RuntimeError as exc:
+            self._emit_log(f"[FAIL] 매크로 스레드 시작 실패: {exc}")
             self.stop_flags.pop(macro_key, None)
             self.running_macros.pop(macro_key, None)
             return False
+
+        self.status_changed.emit(macro_key, "running")
+        return True
 
     def stop_macro(self, macro_key: str) -> bool:
         stop_event = self.stop_flags.get(macro_key)
@@ -258,7 +261,7 @@ class MacroRunner(QObject):
                     break
 
                 time.sleep(0.2)
-        except Exception as exc:
+        except (RuntimeError, ValueError, OSError) as exc:
             self._emit_log(f"[FAIL] 매크로 실행 중 오류: {exc}")
         finally:
             self._log_monitor_end(macro_name)

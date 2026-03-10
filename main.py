@@ -1,16 +1,19 @@
 import os
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def preload_torch_for_windows() -> None:
-    """Windows에서 torch를 먼저 불러서 초기 DLL 오류를 줄입니다."""
+    """윈도우에서 DLL 오류를 초기에 노출하기 위해 torch를 선로딩한다."""
     if os.name != "nt":
         return
 
     try:
         import torch  # noqa: F401
-    except Exception:
-        # 선로딩이 실패해도 실제 실행 시 원래 오류를 다시 보여줍니다.
-        pass
+    except (ImportError, OSError) as exc:
+        logger.warning("torch preload skipped: %s", exc)
 
 
 if __name__ == "__main__":

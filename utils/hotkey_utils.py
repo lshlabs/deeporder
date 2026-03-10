@@ -83,13 +83,18 @@ def parse_hotkey_text(text: str, fallback: str) -> HotkeyComboData:
 def is_hotkey_pressed(combo: HotkeyComboData) -> bool:
     if os.name != "nt":
         return False
+
+    user32 = getattr(ctypes, "windll", None)
+    if user32 is None or not hasattr(user32, "user32"):
+        return False
+
     try:
-        user32 = ctypes.windll.user32
+        keyboard_api = user32.user32
         for group in combo["modifiers"]:
-            if not any(user32.GetAsyncKeyState(virtual_key) & 0x8000 for virtual_key in group):
+            if not any(keyboard_api.GetAsyncKeyState(virtual_key) & 0x8000 for virtual_key in group):
                 return False
-        return any(user32.GetAsyncKeyState(virtual_key) & 0x8000 for virtual_key in combo["primary"])
-    except Exception:
+        return any(keyboard_api.GetAsyncKeyState(virtual_key) & 0x8000 for virtual_key in combo["primary"])
+    except OSError:
         return False
 
 

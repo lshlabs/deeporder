@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ActionWizardDialog</class>
+ <widget class="QDialog" name="ActionWizardDialog">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>460</width><height>260</height></rect></property>
+  <property name="minimumSize"><size><width>460</width><height>260</height></size></property>
+  <property name="maximumSize"><size><width>460</width><height>260</height></size></property>
+  <property name="windowTitle"><string>감시모드 진입</string></property>
+  <property name="styleSheet"><string notr="true">QDialog { background: #f3f4f6; }
+QFrame#Card { background: white; border: 1px solid #d1d5db; border-radius: 14px; }
+QLabel { color: #111827; font-family: 'Malgun Gothic'; }
+QPushButton {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #c7ccd4;
+  background: #ffffff;
+  color: #111827;
+  font: 9pt 'Malgun Gothic';
+}
+QPushButton#PrimaryButton {
+  background: #0ea5e9;
+  border: 1px solid #0284c7;
+  color: white;
+  font-weight: 700;
+}
+QPushButton:disabled { background: #dbeafe; color: #6b7280; border-color: #bfdbfe; }
+QLabel#label_chip { background: #e0f2fe; color: #0369a1; border-radius: 10px; padding: 6px 10px; font: 700 8pt 'Malgun Gothic'; }
+QLabel#label_title { font: 700 13pt 'Malgun Gothic'; }
+QLabel#label_status { font: 9pt 'Malgun Gothic'; }
+QLabel#label_hint { color: #4b5563; font: 8pt 'Malgun Gothic'; }
+</string></property>
+  <layout class="QVBoxLayout" name="root_layout">
+   <property name="leftMargin"><number>18</number></property>
+   <property name="topMargin"><number>18</number></property>
+   <property name="rightMargin"><number>18</number></property>
+   <property name="bottomMargin"><number>18</number></property>
+   <item>
+    <widget class="QFrame" name="Card">
+     <layout class="QVBoxLayout" name="card_layout">
+      <property name="leftMargin"><number>22</number></property>
+      <property name="topMargin"><number>20</number></property>
+      <property name="rightMargin"><number>22</number></property>
+      <property name="bottomMargin"><number>18</number></property>
+      <property name="spacing"><number>14</number></property>
+      <item><widget class="QLabel" name="label_chip"><property name="text"><string>MONITOR MODE</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="maximumSize"><size><width>120</width><height>16777215</height></size></property></widget></item>
+      <item><widget class="QLabel" name="label_title"><property name="text"><string/></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+      <item><widget class="QLabel" name="label_status"><property name="text"><string/></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+      <item><widget class="QLabel" name="label_hint"><property name="text"><string>이미지 업로드 없이 바로 화면을 캡처하고, 이어서 영역 선택으로 이동합니다.</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+      <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer></item>
+      <item>
+       <layout class="QHBoxLayout" name="action_row">
+        <property name="spacing"><number>10</number></property>
+        <item><spacer name="action_spacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+        <item><widget class="QPushButton" name="button_cancel"><property name="text"><string>취소</string></property></widget></item>
+        <item><widget class="QPushButton" name="button_start"><property name="objectName"><string>PrimaryButton</string></property><property name="text"><string>감시모드 시작</string></property></widget></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

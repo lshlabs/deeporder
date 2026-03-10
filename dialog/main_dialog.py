@@ -34,7 +34,7 @@ class GlobalHotkeyEventFilter(QtCore.QAbstractNativeEventFilter):
             return False, 0
         try:
             msg = ctypes.wintypes.MSG.from_address(int(message))
-        except Exception:
+        except (TypeError, ValueError, OSError):
             return False, 0
         if msg.message == WM_HOTKEY:
             self.callback(int(msg.wParam))
@@ -194,8 +194,8 @@ class MainDialog(QtWidgets.QMainWindow):
         for hotkey_id in list(self._registered_hotkey_ids):
             try:
                 user32.UnregisterHotKey(None, hotkey_id)
-            except Exception:
-                pass
+            except OSError:
+                self.on_log_message(f"핫키 해제 실패: id={hotkey_id}")
         self._registered_hotkey_ids.clear()
 
     def _register_global_hotkey(self, hotkey_id: int, hotkey_text: str, fallback: str):
@@ -204,7 +204,7 @@ class MainDialog(QtWidgets.QMainWindow):
         modifiers, key_code = parse_hotkey_for_register(hotkey_text, fallback)
         try:
             registered = bool(ctypes.windll.user32.RegisterHotKey(None, hotkey_id, modifiers, key_code))
-        except Exception:
+        except (AttributeError, OSError):
             registered = False
         if registered:
             self._registered_hotkey_ids.add(hotkey_id)
@@ -375,7 +375,7 @@ class MainDialog(QtWidgets.QMainWindow):
                 current_item.setText(f"{macro_name}{RUNNING_SUFFIX}")
                 self._apply_action_state(is_running=True)
                 self.showMinimized()
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.on_log_message(f"RUN 실행 오류: {e}")
             QtWidgets.QMessageBox.warning(self, "실행 오류", f"매크로 실행 시작에 실패했습니다.\n{e}")
 
@@ -419,7 +419,6 @@ class MainDialog(QtWidgets.QMainWindow):
 
     def on_log_message(self, message):
         self.ui_logger.info(message)
-        print(f"로그: {message}")
 
     def load_macro_list(self):
         self.listWidget.clear()
@@ -475,10 +474,6 @@ class MainDialog(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication([])
-    app.setStyleSheet(
-        "QWidget { font-family: 'Malgun Gothic'; font-size: 9pt; }"
-        "QLabel#label_title, QLabel#label_run, QLabel#label_stop { font-size: 20pt; font-weight: 700; }"
-    )
     window = MainDialog()
     window.show()
     app.exec()
